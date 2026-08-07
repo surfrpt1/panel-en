@@ -799,7 +799,7 @@
 					// 200 = Worker 端鉴权通过（cookie 有效），跳转 /admin
 					if (authResponse.ok) {
 						sessionStorage.setItem(REDIRECT_KEY, '1');
-						window.location.replace('/admin');
+						window.location.replace('/dashboard/');
 						return;
 					}
 				} catch (_) {
@@ -974,7 +974,7 @@
 				// 使用 redirect: 'manual' 拦截 302，直接跳转 /admin。
 				if (response.type === 'opaqueredirect') {
 					// Worker 返回了重定向 = auth cookie 仍然有效，直接进 /admin
-					window.location.replace('/admin');
+					window.location.replace('/dashboard/');
 					return;
 				}
 
@@ -986,7 +986,7 @@
 						const data = await response.json();
 						if (data.success) {
 							// 登录成功，使用 replace 避免留下 /login 在浏览器历史中
-							window.location.replace('/admin');
+							window.location.replace('/dashboard/');
 						}
 					} else {
 						// 返回的是HTML，说明密码错误
