@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard - Surfrpt Panel</title>
+<link rel="stylesheet" href="./style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://cdn.jsdelivr.net/npm/@keeex/qrcodejs-kx@1.0.2/qrcode.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js" defer></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-icon">🚀</span>
+    <span id="pageTitle">Surfrpt Panel</span>
+  </div>
+  <div class="topbar-actions">
+    <button id="versionBadge" class="version-badge hidden" type="button" title="Version info"></button>
+    <button id="themeToggle" type="button" title="Toggle theme">🌙</button>
+    <button id="userModeToggle" type="button"></button>
+    <button id="logoutBtn" type="button" title="Log out">🚪 Logout</button>
+  </div>
+</header>
+
+<main class="page-wrapper">
+<div class="card-container" id="cardContainer">
+
+  <section class="module collapsed" id="m-cfusage">
+    <div class="module-title" onclick="toggleModule('m-cfusage')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">Workers / Pages Request Usage</span>
+      <span class="countdown" id="cfCountdown"></span>
+    </div>
+    <div class="module-content">
+      <div class="cf-usage-grid" id="cfUsageBody">
+        <div class="cf-stat"><span class="cf-stat-label">Pages requests</span><span class="cf-stat-value" id="cfPagesValue">-</span></div>
+        <div class="cf-stat"><span class="cf-stat-label">Workers requests</span><span class="cf-stat-value" id="cfWorkersValue">-</span></div>
+        <div class="cf-stat"><span class="cf-stat-label">Total used</span><span class="cf-stat-value" id="cfTotalValue">-</span></div>
+        <div class="cf-stat"><span class="cf-stat-label">Daily quota</span><span class="cf-stat-value" id="cfMaxValue">-</span></div>
+        <div class="cf-stat"><span class="cf-stat-label">Percent used</span><span class="cf-stat-value" id="cfPercentValue">-</span></div>
+      </div>
+      <div class="module-actions">
+        <button type="button" id="btnOpenCloudflareConfig" onclick="openCloudflareConfigModal()">⚙️ Configure API</button>
+        <button type="button" class="btn-danger" onclick="openClearCloudflareModal()">🗑 Clear credentials</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="module network-detail-collapsed" id="m-network">
+    <div class="module-title" onclick="toggleNetworkModule()">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">🌍 Current Network Info</span>
+    </div>
+    <div class="module-content" id="network-module-content" style="display:none">
+      <div class="network-cards-container" id="networkCardsContainer"></div>
+      <div class="latency-cards" id="latency-cards"></div>
+    </div>
+  </section>
+
+  <section class="module" id="m-links">
+    <div class="module-title" onclick="toggleModule('m-links')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">📋 Get Node Links</span>
+    </div>
+    <div class="module-content">
+      <div class="field-row">
+        <label>Node link</label>
+        <div class="field-control">
+          <input type="text" id="LinkURL" readonly>
+          <button type="button" onclick="copyField('LinkURL')">📋 Copy</button>
+          <button type="button" onclick="showQRCode('LinkURL')">▦ QR</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>Auto subscription</label>
+        <div class="field-control">
+          <input type="text" id="subLink" readonly>
+          <button type="button" onclick="copyField('subLink')">📋 Copy</button>
+          <button type="button" onclick="showQRCode('subLink')">▦ QR</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>Base64 subscription</label>
+        <div class="field-control">
+          <input type="text" id="base64Link" readonly>
+          <button type="button" onclick="copyField('base64Link')">📋 Copy</button>
+          <button type="button" onclick="showQRCode('base64Link')">▦ QR</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>Clash subscription</label>
+        <div class="field-control">
+          <input type="text" id="clashLink" readonly>
+          <button type="button" onclick="copyField('clashLink')">📋 Copy</button>
+          <button type="button" onclick="showQRCode('clashLink')">▦ QR</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>SingBox subscription</label>
+        <div class="field-control">
+          <input type="text" id="singboxLink" readonly>
+          <button type="button" onclick="copyField('singboxLink')">📋 Copy</button>
+          <button type="button" onclick="showQRCode('singboxLink')">▦ QR</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="module" id="m-subgen">
+    <div class="module-title non-collapsible" onclick="event.stopPropagation()">
+      <span class="collapse-icon">▾</span>
+      <span class="module-name">⚡️ Preferred Subscription Generator</span>
+    </div>
+    <div class="module-content">
+      <div class="field-row">
+        <label>Subscription mode</label>
+        <div class="field-control">
+          <select id="ipMode" onchange="updateIPMode()">
+            <option value="generator">Aggregate external subscription (generator URL)</option>
+            <option value="random">Random preferred IP</option>
+            <option value="custom">Custom preferred IP list</option>
+          </select>
+        </div>
+      </div>
+      <div class="sub-mode" id="generatorSection" style="display:none">
+        <div class="field-row">
+          <label>Generator URL</label>
+          <div class="field-control">
+            <input type="text" id="generatorURL" placeholder="sub.cmliussss.net" oninput="processGeneratorURL()">
+          </div>
+        </div>
+        <p class="hint">Your node will use this external subscription generator to build the preferred IP list.</p>
+      </div>
+      <div class="sub-mode" id="randomIPSection" style="display:none">
+        <div class="field-row">
+          <label>Number of IPs</label>
+          <div class="field-control">
+            <input type="number" id="randomCount" min="1" max="99" value="16">
+          </div>
+        </div>
+        <div class="field-row" id="specifiedPortRow" style="display:none">
+          <label>Preferred port</label>
+          <div class="field-control">
+            <select id="specifiedPort">
+              <option value="-1">Random port</option>
+              <option value="443">443</option>
+              <option value="2053">2053</option>
+              <option value="2083">2083</option>
+              <option value="2087">2087</option>
+              <option value="2096">2096</option>
+              <option value="8443">8443</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="sub-mode" id="customIPSection" style="display:none">
+        <div class="field-row">
+          <label>Custom preferred IP list</label>
+          <div class="field-control">
+            <textarea id="customIPs" rows="8" spellcheck="false" placeholder="1.2.3.4:443&#10;example.com#Remark"></textarea>
+          </div>
+        </div>
+        <div class="module-actions">
+          <button type="button" onclick="openOnlineOptimizeModal()">🎯 Online Optimize (BestCF)</button>
+          <button type="button" onclick="openAPIOptimizeModal()">🛜 API Optimize</button>
+          <button type="button" id="btnChainProxy" onclick="openChainProxyModal()">🔗 Add Chain Proxy</button>
+        </div>
+      </div>
+      <div class="module-actions">
+        <button type="button" id="saveSubBtn" onclick="saveSub()">💾 Save</button>
+        <button type="button" id="cancelSubBtn" onclick="cancelEdit('sub')">↩ Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="module collapsed advanced-module" id="m-config">
+    <div class="module-title" onclick="toggleModule('m-config')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">⚙️ Detailed Config</span>
+    </div>
+    <div class="module-content">
+      <div class="field-row">
+        <label>Subscription name</label>
+        <div class="field-control"><input type="text" id="subNameInput"></div>
+      </div>
+      <div class="field-row">
+        <label>Protocol</label>
+        <div class="field-control"><select id="protocolSelect" onchange="onProtocolChange()"></select></div>
+      </div>
+      <div class="field-row">
+        <label>Transport</label>
+        <div class="field-control"><select id="transportSelect"></select></div>
+      </div>
+      <div class="field-row" id="grpcModeRow">
+        <label>gRPC mode</label>
+        <div class="field-control"><select id="grpcModeSelect"><option value="gun">gun</option><option value="multi">multi</option></select></div>
+      </div>
+      <div class="field-row" id="grpcUaRow">
+        <label>gRPC User-Agent</label>
+        <div class="field-control"><input type="text" id="grpcUaInput"></div>
+      </div>
+      <div class="field-row" id="ssSection">
+        <label>SS encryption</label>
+        <div class="field-control">
+          <select id="ssMethodSelect">
+            <option value="aes-128-gcm">aes-128-gcm</option>
+            <option value="aes-256-gcm">aes-256-gcm</option>
+            <option value="chacha20-poly1305">chacha20-poly1305</option>
+            <option value="none">none</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row" id="ssTLSRow">
+        <label>SS TLS</label>
+        <div class="field-control">
+          <select id="ssTLSSelect" onchange="onSSTLSChange()"><option value="true">On</option><option value="false">Off</option></select>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>Fingerprint</label>
+        <div class="field-control">
+          <select id="fingerprintSelect">
+            <option value="chrome">chrome</option>
+            <option value="firefox">firefox</option>
+            <option value="safari">safari</option>
+            <option value="random">random</option>
+            <option value="none">none</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>TLS fragment</label>
+        <div class="field-control">
+          <select id="tlsFragmentSelect">
+            <option value="">Off</option>
+            <option value="Shadowrocket">Shadowrocket</option>
+            <option value="Happ">Happ</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>Path</label>
+        <div class="field-control"><input type="text" id="pathInput" oninput="onPathChange()"></div>
+      </div>
+      <div class="field-row checkbox-row">
+        <label><input type="checkbox" id="skipCertCheckbox"> Skip certificate verification</label>
+      </div>
+      <div class="field-row checkbox-row">
+        <label><input type="checkbox" id="randomPathCheckbox"> Random path</label>
+      </div>
+      <div class="field-row checkbox-row">
+        <label><input type="checkbox" id="enable0RTTCheckbox"> Enable 0-RTT</label>
+      </div>
+      <div class="module-actions">
+        <button type="button" id="saveConfigBtn" onclick="saveConfig()">💾 Save</button>
+        <button type="button" id="cancelConfigBtn" onclick="cancelEdit('config')">↩ Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="module collapsed advanced-module" id="m-ech">
+    <div class="module-title" onclick="toggleModule('m-ech')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">🔐 Encrypted Client Hello (ECH)</span>
+    </div>
+    <div class="module-content">
+      <div class="field-row checkbox-row">
+        <label><input type="checkbox" id="enableECHCheckbox"> Enable ECH</label>
+        <button type="button" class="btn-ghost" onclick="openModal('echHelpModal')">❓ What is ECH?</button>
+      </div>
+      <div class="field-row" id="echDNSRow">
+        <label>DNS server</label>
+        <div class="field-control">
+          <select id="echDNSSelect" onchange="onEchDNSSelectChange()"></select>
+          <input type="text" id="echDNSCustom" style="display:none" placeholder="https://dns.example.com/dns-query">
+          <input type="hidden" id="echDNSValue">
+        </div>
+      </div>
+      <div class="field-row" id="echSNIRow">
+        <label>SNI</label>
+        <div class="field-control">
+          <select id="echSNISelect" onchange="onEchSNISelectChange()"></select>
+          <input type="text" id="echSNICustom" style="display:none" placeholder="your-sni.example.com">
+          <input type="hidden" id="echSNIValue">
+        </div>
+      </div>
+      <div class="module-actions">
+        <button type="button" id="saveEchBtn" onclick="saveEch()">💾 Save</button>
+        <button type="button" id="cancelEchBtn" onclick="cancelEdit('ech')">↩ Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="module collapsed advanced-module" id="m-proxy">
+    <div class="module-title" onclick="toggleModule('m-proxy')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">🌐 Cloudflare CDN / Proxy Access</span>
+    </div>
+    <div class="module-content">
+      <div class="field-row">
+        <label>Proxy mode</label>
+        <div class="field-control">
+          <select id="proxyModeSelect" onchange="updateProxyMode(true)">
+            <option value="auto">Auto</option>
+            <option value="socks5">SOCKS5</option>
+            <option value="http">HTTP</option>
+            <option value="https">HTTPS</option>
+            <option value="turn">TURN</option>
+            <option value="sstp">SSTP</option>
+          </select>
+        </div>
+      </div>
+      <div class="proxy-mode" id="autoSection">
+        <div class="field-row checkbox-row">
+          <label><input type="checkbox" id="autoProxyCheckbox" onchange="onAutoProxyChange()"> Auto-detected ProxyIP (auto)</label>
+        </div>
+        <div class="field-row" id="proxyIPRow">
+          <label>ProxyIP address</label>
+          <div class="field-control">
+            <input type="text" id="proxyIPInput" placeholder="1.2.3.4:443">
+            <button type="button" onclick="showGetMoreProxyIPModal()">🔍 Find more ProxyIP</button>
+          </div>
+        </div>
+      </div>
+      <div class="proxy-mode" id="socks5Section">
+        <div class="field-row">
+          <label>SOCKS5 address</label>
+          <div class="field-control">
+            <input type="text" id="socks5Addr" placeholder="user:pass@1.2.3.4:1080">
+            <button type="button" onclick="verifyProxy('socks5')">✔ Verify</button>
+            <button type="button" onclick="showExploreModal('socks5')">🔍 Browse list</button>
+          </div>
+        </div>
+        <div class="field-row checkbox-row"><label><input type="checkbox" id="globalSocks5"> Global proxy</label></div>
+        <div class="field-row">
+          <label>SOCKS5 whitelist</label>
+          <div class="field-control"><textarea id="socks5Whitelist" rows="4" placeholder="*example.com&#10;*.cdn.net"></textarea></div>
+        </div>
+      </div>
+      <div class="proxy-mode" id="httpSection">
+        <div class="field-row">
+          <label>HTTP address</label>
+          <div class="field-control">
+            <input type="text" id="httpAddr" placeholder="user:pass@1.2.3.4:8080">
+            <button type="button" onclick="verifyProxy('http')">✔ Verify</button>
+            <button type="button" onclick="showExploreModal('http')">🔍 Browse list</button>
+          </div>
+        </div>
+        <div class="field-row checkbox-row"><label><input type="checkbox" id="globalHTTP"> Global proxy</label></div>
+      </div>
+      <div class="proxy-mode" id="httpsSection">
+        <div class="field-row">
+          <label>HTTPS address</label>
+          <div class="field-control">
+            <input type="text" id="httpsAddr" placeholder="user:pass@1.2.3.4:443">
+            <button type="button" onclick="verifyProxy('https')">✔ Verify</button>
+            <button type="button" onclick="showExploreModal('https')">🔍 Browse list</button>
+          </div>
+        </div>
+        <div class="field-row checkbox-row"><label><input type="checkbox" id="globalHTTPS"> Global proxy</label></div>
+      </div>
+      <div class="proxy-mode" id="turnSection">
+        <div class="field-row">
+          <label>TURN address</label>
+          <div class="field-control">
+            <input type="text" id="turnAddr" placeholder="user:pass@1.2.3.4:3478">
+            <button type="button" onclick="verifyProxy('turn')">✔ Verify</button>
+          </div>
+        </div>
+        <div class="field-row checkbox-row"><label><input type="checkbox" id="globalTURN"> Global proxy</label></div>
+      </div>
+      <div class="proxy-mode" id="sstpSection">
+        <div class="field-row">
+          <label>SSTP address</label>
+          <div class="field-control">
+            <input type="text" id="sstpAddr" placeholder="user:pass@1.2.3.4:443">
+            <button type="button" onclick="verifyProxy('sstp')">✔ Verify</button>
+          </div>
+        </div>
+        <div class="field-row checkbox-row"><label><input type="checkbox" id="globalSSTP"> Global proxy</label></div>
+      </div>
+      <div class="module-actions">
+        <button type="button" onclick="showPathTemplateConfigModal()">🗂 Path Templates</button>
+        <button type="button" class="btn-ghost" onclick="openModal('proxyIPHelpModal')">🤔 Why ProxyIP?</button>
+      </div>
+      <div class="module-actions">
+        <button type="button" id="saveProxyBtn" onclick="saveProxy()">💾 Save</button>
+        <button type="button" id="cancelProxyBtn" onclick="cancelEdit('proxy')">↩ Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="module collapsed advanced-module" id="m-convert">
+    <div class="module-title" onclick="toggleModule('m-convert')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">🔄 Subscription Convert</span>
+    </div>
+    <div class="module-content">
+      <div class="field-row">
+        <label>SubConvert API</label>
+        <div class="field-control">
+          <input type="text" id="subAPIInput">
+          <button type="button" onclick="openSubAPIModal()">🔧 Select</button>
+        </div>
+      </div>
+      <div class="field-row">
+        <label>SubConvert config</label>
+        <div class="field-control">
+          <select id="subConfigSelect" onchange="onSubConfigSelectChange()"></select>
+          <input type="text" id="subConfigCustomInput" style="display:none" placeholder="https://example.com/config.ini" oninput="onSubConfigCustomInput()">
+        </div>
+      </div>
+      <div class="field-row checkbox-row" id="subListRow"><label><input type="checkbox" id="subList"> Merge subscription list (SUBLIST)</label></div>
+      <div class="field-row checkbox-row" id="udpRow"><label><input type="checkbox" id="udp"> Enable UDP</label></div>
+      <div class="field-row checkbox-row" id="xudpRow"><label><input type="checkbox" id="xudp"> Enable XUDP</label></div>
+      <div class="field-row checkbox-row" id="tls13Row"><label><input type="checkbox" id="tls13"> Force TLS 1.3</label></div>
+      <div class="field-row checkbox-row" id="appendTypeRow"><label><input type="checkbox" id="appendType"> Append protocol to name</label></div>
+      <div class="field-row checkbox-row" id="sortRow"><label><input type="checkbox" id="sort"> Sort nodes</label></div>
+      <div class="module-actions">
+        <button type="button" id="saveConvertBtn" onclick="saveConvert()">💾 Save</button>
+        <button type="button" id="cancelConvertBtn" onclick="cancelEdit('convert')">↩ Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="module collapsed advanced-module" id="m-notify">
+    <div class="module-title" onclick="toggleModule('m-notify')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">🔔 Notifications</span>
+    </div>
+    <div class="module-content">
+      <div class="notification-controls">
+        <h3>🤖 Telegram Bot</h3>
+        <div class="field-row checkbox-row">
+          <label><input type="checkbox" id="tgEnabledCheckbox" onchange="markModified('notification')"> Enable Telegram notifications</label>
+        </div>
+        <div class="module-actions">
+          <button type="button" onclick="openTelegramConfigModal()">⚙️ Configure</button>
+          <button type="button" class="btn-danger" onclick="openClearTelegramModal()">🗑 Clear</button>
+        </div>
+      </div>
+      <div class="notification-controls">
+        <h3>☁️ Cloudflare Usage API</h3>
+        <div class="module-actions">
+          <button type="button" onclick="openCloudflareConfigModal()">⚙️ Configure</button>
+          <button type="button" class="btn-danger" onclick="openClearCloudflareModal()">🗑 Clear</button>
+        </div>
+      </div>
+      <div class="module-actions">
+        <button type="button" id="saveNotificationBtn" onclick="saveNotification()">💾 Save</button>
+        <button type="button" id="cancelNotificationBtn" onclick="cancelEdit('notification')">↩ Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="module collapsed advanced-module" id="m-logs">
+    <div class="module-title" onclick="toggleModule('m-logs'); loadLogsOnExpand()">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">📋 Operation Logs</span>
+    </div>
+    <div class="module-content">
+      <div id="logsList" class="logs-list"></div>
+      <div class="module-actions">
+        <button type="button" onclick="showAllLogs()">📄 View all logs</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+</main>
+
+<footer class="footer">
+  <span id="versionFooterText">Surfrpt Panel</span>
+  <span>· <a href="#" onclick="openVersionInfoModal(); return false;">About</a></span>
+  <span>· <a href="#" onclick="openVersionChangelogModal(); return false;">Changelog</a></span>
+</footer>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ============ MODALS ============ -->
+
+<div class="modal" id="qrcodeModal">
+  <div class="modal-backdrop" onclick="closeModal('qrcodeModal')"></div>
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h2>QR Code</h2><button type="button" class="modal-close" onclick="closeModal('qrcodeModal')">×</button></div>
+    <div class="modal-body center"><div id="qrcodeContainer"></div><div id="qrcodeError" class="error-text hidden"></div></div>
+  </div>
+</div>
+
+<div class="modal" id="resetModal">
+  <div class="modal-backdrop" onclick="closeModal('resetModal')"></div>
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h2>⚠️ Reset Config</h2><button type="button" class="modal-close" onclick="closeModal('resetModal')">×</button></div>
+    <div class="modal-body">
+      <p>This will reset all settings to defaults. This cannot be undone.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" onclick="confirmReset()">Confirm reset</button>
+        <button type="button" onclick="closeModal('resetModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="hostsEditModal">
+  <div class="modal-backdrop" onclick="closeModal('hostsEditModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>✏️ Edit Hosts (Custom Domains)</h2><button type="button" class="modal-close" onclick="closeModal('hostsEditModal')">×</button></div>
+    <div class="modal-body">
+      <p class="hint">One domain per line. These hosts are used when generating subscription nodes.</p>
+      <textarea id="hostsTextarea" rows="8" spellcheck="false"></textarea>
+      <div class="modal-actions">
+        <button type="button" id="btnConfirmHosts" onclick="confirmHostsEdit()">Save</button>
+        <button type="button" onclick="closeModal('hostsEditModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="hostsMismatchModal">
+  <div class="modal-backdrop" onclick="closeModal('hostsMismatchModal')"></div>
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h2>⚠️ Domain Mismatch</h2><button type="button" class="modal-close" onclick="closeModal('hostsMismatchModal')">×</button></div>
+    <div class="modal-body">
+      <p>The current domain is not in your configured hosts list. Nodes may not work as expected.</p>
+      <div class="modal-actions">
+        <button type="button" onclick="openHostsEditModal()">Edit hosts</button>
+        <button type="button" class="btn-ghost" onclick="dismissHostsMismatchNotification()">Dismiss for 24h</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="pathTemplateModal">
+  <div class="modal-backdrop" onclick="closeModal('pathTemplateModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>⚙️ Path Template Config</h2><button type="button" class="modal-close" onclick="closeModal('pathTemplateModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field-row">
+        <label>Presets</label>
+        <div class="field-control"><select id="presetTemplateSelect" onchange="onPresetTemplateChange()"></select></div>
+      </div>
+      <div class="field-row">
+        <label>ProxyIP template</label>
+        <div class="field-control"><input type="text" id="proxyIPTemplateInput" placeholder="/proxyip={{IP:PORT}}" oninput="onPathTemplateInput()"></div>
+      </div>
+      <div class="field-row">
+        <label>SOCKS5 standard</label>
+        <div class="field-control"><input type="text" id="socks5StandardTemplateInput" placeholder="socks5={{IP:PORT}}" oninput="onPathTemplateInput()"></div>
+      </div>
+      <div class="field-row">
+        <label>SOCKS5 global</label>
+        <div class="field-control"><input type="text" id="socks5GlobalTemplateInput" placeholder="socks5://{{IP:PORT}}" oninput="onPathTemplateInput()"></div>
+      </div>
+      <div class="field-row">
+        <label>HTTP standard</label>
+        <div class="field-control"><input type="text" id="httpStandardTemplateInput" placeholder="http={{IP:PORT}}" oninput="onPathTemplateInput()"></div>
+      </div>
+      <div class="field-row">
+        <label>HTTP global</label>
+        <div class="field-control"><input type="text" id="httpGlobalTemplateInput" placeholder="http://{{IP:PORT}}" oninput="onPathTemplateInput()"></div>
+      </div>
+      <p class="hint">Templates must contain <code>{{IP:PORT}}</code>.</p>
+      <div class="modal-actions">
+        <button type="button" id="pathTemplateSaveBtn" onclick="savePathTemplateConfig()">Save</button>
+        <button type="button" onclick="closeModal('pathTemplateModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="chainProxyModal">
+  <div class="modal-backdrop" onclick="closeModal('chainProxyModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>🔗 Add Chain Proxy Node</h2><button type="button" class="modal-close" onclick="closeModal('chainProxyModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field-row"><label>Node name</label><div class="field-control"><input type="text" id="chainProxyNodeName" placeholder="Chain proxy"></div></div>
+      <div class="field-row"><label>Preferred host</label><div class="field-control"><input type="text" id="chainProxyHost"></div></div>
+      <div class="field-row"><label>Preferred port</label><div class="field-control"><input type="number" id="chainProxyPort" min="1" max="65535"></div></div>
+      <div class="field-row">
+        <label>Protocol</label>
+        <div class="field-control">
+          <select id="chainProxyProtocol" onchange="resetChainProxyValidation()">
+            <option value="socks5">SOCKS5</option>
+            <option value="http">HTTP</option>
+            <option value="https">HTTPS</option>
+            <option value="turn">TURN</option>
+            <option value="sstp">SSTP</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row"><label>Address</label><div class="field-control"><input type="text" id="chainProxyAddress" placeholder="user:pass@1.2.3.4:1080" oninput="sanitizeChainProxyAddressInput()"></div></div>
+      <div class="modal-actions">
+        <button type="button" id="btnVerifyChainProxy" onclick="verifyChainProxyAvailability()">✔ Verify</button>
+        <button type="button" id="btnAddChainProxy" onclick="addChainProxyNode()" disabled>➕ Add node</button>
+      </div>
+      <div id="chainProxyStatus"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="proxyVerifyModal">
+  <div class="modal-backdrop" onclick="closeModal('proxyVerifyModal')"></div>
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h2>✔ Verify Proxy</h2><button type="button" class="modal-close" onclick="closeModal('proxyVerifyModal')">×</button></div>
+    <div class="modal-body">
+      <input type="text" id="proxyVerificationInput" placeholder="user:pass@1.2.3.4:1080" style="display:none">
+      <div id="proxyVerifyStatus"></div>
+      <div class="modal-actions">
+        <button type="button" id="btnConfirmProxyAddress" onclick="confirmProxyAddress()" disabled>Confirm</button>
+        <button type="button" onclick="closeModal('proxyVerifyModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="proxyIPHelpModal">
+  <div class="modal-backdrop" onclick="closeModal('proxyIPHelpModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>🤔 Why ProxyIP / Reverse Proxy mode?</h2><button type="button" class="modal-close" onclick="closeModal('proxyIPHelpModal')">×</button></div>
+    <div class="modal-body">
+      <p>Reverse-proxy mode routes your traffic through a ProxyIP so that the Cloudflare connection stays stable and reachable in regions where the raw domain/IP is blocked. A ProxyIP is a server that forwards your vless/trojan traffic onward, hiding the real destination while the client still connects to Cloudflare.</p>
+      <p><strong>Important:</strong> For the proxy to work you need a ProxyIP that also supports your protocol (vless/trojan over the same transport). Use <em>Verify</em> to test an address before saving, or use the <em>Find more</em> lists.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="echHelpModal">
+  <div class="modal-backdrop" onclick="closeModal('echHelpModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>🔐 What is ECH?</h2><button type="button" class="modal-close" onclick="closeModal('echHelpModal')">×</button></div>
+    <div class="modal-body">
+      <h3>Background</h3>
+      <p>Encrypted Client Hello (ECH) encrypts the SNI (server name) inside the TLS handshake, so a middlebox cannot see which domain you are connecting to.</p>
+      <h3>What problems does it solve?</h3>
+      <p>Plaintext SNI lets network middleboxes (e.g. GFW) fingerprint and throttle Cloudflare traffic. ECH hides the SNI so the connection looks like a normal HTTPS request to any host.</p>
+      <h3>How to use ECH</h3>
+      <p>Enable ECH, pick a DNS server and SNI. Clients that support ECH: recent Xray/V2Ray, sing-box, and clients with ECH support enabled. For best compatibility use the default <code>cloudflare-ech.com</code> SNI.</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="subApiModal">
+  <div class="modal-backdrop" onclick="closeModal('subApiModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>🔌 SubConvert API</h2><button type="button" class="modal-close" onclick="closeModal('subApiModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field-row">
+        <label>API</label>
+        <div class="field-control"><select id="subApiSelect" onchange="handleSubAPISelectChange()"></select></div>
+      </div>
+      <div class="field-row" id="subApiCustomRow" style="display:none">
+        <label>Custom URL</label>
+        <div class="field-control"><input type="text" id="subApiCustomInput" placeholder="https://SUBAPI.example.com"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="testSubAPI()">✔ Test</button>
+        <button type="button" id="btnConfirmSubAPI" onclick="confirmSubAPI()" disabled>Confirm</button>
+      </div>
+      <div id="subApiStatus"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="telegramConfigModal">
+  <div class="modal-backdrop" onclick="closeModal('telegramConfigModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>🤖 Telegram Bot Config</h2><button type="button" class="modal-close" onclick="closeModal('telegramConfigModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field-row"><label>Bot token</label><div class="field-control"><input type="password" id="telegramTokenInput" placeholder="123456:ABC-DEF..."></div></div>
+      <div class="field-row"><label>Chat ID</label><div class="field-control"><input type="text" id="telegramChatIDInput" placeholder="-100123456789"></div></div>
+      <div class="modal-actions">
+        <button type="button" onclick="testTelegramConfig()">✔ Test</button>
+        <button type="button" id="btnConfirmTelegram" onclick="confirmTelegramConfig()" disabled>Confirm</button>
+      </div>
+      <div id="telegramTestStatus"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="clearTelegramModal">
+  <div class="modal-backdrop" onclick="closeModal('clearTelegramModal')"></div>
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h2>⚠️ Clear Telegram Config</h2><button type="button" class="modal-close" onclick="closeModal('clearTelegramModal')">×</button></div>
+    <div class="modal-body">
+      <p>Remove the Telegram bot credentials? Notifications will stop.</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" onclick="confirmClearTelegramConfig()">Clear</button>
+        <button type="button" onclick="closeModal('clearTelegramModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="cloudflareConfigModal">
+  <div class="modal-backdrop" onclick="closeModal('cloudflareConfigModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>☁️ Cloudflare Usage API</h2><button type="button" class="modal-close" onclick="closeModal('cloudflareConfigModal')">×</button></div>
+    <div class="modal-body">
+      <div class="field-row">
+        <label>Auth method</label>
+        <div class="field-control">
+          <select id="cfAuthMethod" onchange="updateCloudflareAuthMethod()">
+            <option value="accountid">Account ID + API Token</option>
+            <option value="email">Email + Global API Key</option>
+            <option value="usageapi">Usage API URL</option>
+          </select>
+        </div>
+      </div>
+      <div id="cloudflareEmailSection" style="display:none">
+        <div class="field-row"><label>Email</label><div class="field-control"><input type="text" id="cfEmailInput"></div></div>
+        <div class="field-row"><label>Global API Key</label><div class="field-control"><input type="password" id="cfGlobalKeyInput"></div></div>
+      </div>
+      <div id="cloudflareAccountIDSection">
+        <div class="field-row"><label>Account ID</label><div class="field-control"><input type="text" id="cfAccountIDInput"></div></div>
+        <div class="field-row"><label>API Token</label><div class="field-control"><input type="password" id="cfAPITokenInput"></div></div>
+      </div>
+      <div id="cloudflareUsageAPISection" style="display:none">
+        <div class="field-row"><label>Usage API URL</label><div class="field-control"><input type="text" id="cfUsageAPIInput" placeholder="https://api.cloudflare.com/client/v4/graphql"></div></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="testCloudflareConfig()">✔ Test</button>
+        <button type="button" id="btnConfirmCloudflare" onclick="confirmCloudflareConfig()" disabled>Confirm</button>
+      </div>
+      <div id="cfTestStatus"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="clearCloudflareModal">
+  <div class="modal-backdrop" onclick="closeModal('clearCloudflareModal')"></div>
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h2>⚠️ Clear Cloudflare Config</h2><button type="button" class="modal-close" onclick="closeModal('clearCloudflareModal')">×</button></div>
+    <div class="modal-body">
+      <p>Remove the Cloudflare usage credentials?</p>
+      <div class="modal-actions">
+        <button type="button" class="btn-danger" onclick="confirmClearCloudflareConfig()">Clear</button>
+        <button type="button" onclick="closeModal('clearCloudflareModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="logsModal">
+  <div class="modal-backdrop" onclick="closeModal('logsModal')"></div>
+  <div class="modal-panel modal-lg">
+    <div class="modal-header"><h2>📋 All Operation Logs</h2><button type="button" class="modal-close" onclick="closeModal('logsModal')">×</button></div>
+    <div class="modal-body">
+      <div class="table-wrap">
+        <table id="logsTable">
+          <thead><tr><th>Time</th><th>IP</th><th>Region</th><th>ASN</th><th>Action</th><th>URL</th><th>User-Agent</th></tr></thead>
+          <tbody id="logsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="versionInfoModal">
+  <div class="modal-backdrop" onclick="closeModal('versionInfoModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>🚀 About edgetunnel</h2><button type="button" class="modal-close" onclick="closeModal('versionInfoModal')">×</button></div>
+    <div class="modal-body" id="versionInfoBody">
+      <p>edgetunnel is a VLESS/Trojan/SS single-file Cloudflare Workers &amp; Pages proxy panel. This dashboard is a clean-room English rewrite of its admin UI, talking to the same worker backend.</p>
+      <p>Current version: <span id="versionInfoVersion">unknown</span></p>
+      <p><a href="#" onclick="loadVersionChangelog(true); openModal('versionChangelogModal'); return false;">View changelog</a></p>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="versionChangelogModal">
+  <div class="modal-backdrop" onclick="closeModal('versionChangelogModal')"></div>
+  <div class="modal-panel modal-lg">
+    <div class="modal-header"><h2>📜 Changelog</h2><button type="button" class="modal-close" onclick="closeModal('versionChangelogModal')">×</button></div>
+    <div class="modal-body"><div id="changelogBody"><p>Loading…</p></div></div>
+  </div>
+</div>
+
+<div class="modal" id="ipDetailModal">
+  <div class="modal-backdrop" onclick="closeModal('ipDetailModal')"></div>
+  <div class="modal-panel modal-lg">
+    <div class="modal-header"><h2>🔍 IP Detail <span class="hint">data source: ipapi.is</span></h2><button type="button" class="modal-close" onclick="closeModal('ipDetailModal')">×</button></div>
+    <div class="modal-body">
+      <div id="ipDetailBody"></div>
+      <div id="ipDetailMap" class="ip-map"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="onlineOptimizeModal">
+  <div class="modal-backdrop" onclick="closeOnlineOptimizeModal()"></div>
+  <div class="modal-panel modal-full">
+    <div class="modal-body frame-body"><iframe id="onlineOptimizeFrame" title="Online Optimize"></iframe></div>
+  </div>
+</div>
+
+<div class="modal" id="ssTLSDisableModal">
+  <div class="modal-backdrop" onclick="closeModal('ssTLSDisableModal')"></div>
+  <div class="modal-panel modal-sm">
+    <div class="modal-header"><h2>⚠️ SS TLS</h2><button type="button" class="modal-close" onclick="closeModal('ssTLSDisableModal')">×</button></div>
+    <div class="modal-body">
+      <p>Disabling TLS for Shadowsocks requires you to connect with plain port 80 over WS. Continue?</p>
+      <div class="modal-actions">
+        <button type="button" onclick="confirmDisableSSTLS()">Confirm</button>
+        <button type="button" onclick="cancelDisableSSTLS()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Explore modals: dynamic content, injected by JS -->
+<div id="exploreModalsHost"></div>
+
+<script src="./app.js"></script>
+</body>
+</html>
