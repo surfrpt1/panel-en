@@ -111,13 +111,77 @@
   window.alert = function (msg) { return origAlert(translateText(String(msg))); };
   window.confirm = function (msg) { return origConfirm(translateText(String(msg))); };
 
+  window.__i18nTranslate = translateText;
+  window.__i18nNode = translateNode;
+
+  function bootFrame() {
+    try {
+      var W = window.parent;
+      var tr = W.__i18nTranslate, tn = W.__i18nNode;
+      if (!tr || !tn) return;
+      if (document.title) document.title = tr(document.title);
+      if (document.body) tn(document.body);
+      if (window.MutationObserver && !window.__i18nObserved) {
+        window.__i18nObserved = true;
+        new MutationObserver(function (muts) {
+          var need = false;
+          for (var i = 0; i < muts.length; i++) {
+            if (muts[i].type === 'childList' || (muts[i].type === 'characterData' && muts[i].target && hasCJK(muts[i].target.nodeValue))) {
+              need = true;
+              break;
+            }
+          }
+          if (need && document.body) tn(document.body);
+        }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+      }
+    } catch (e) {}
+  }
+
+  function attachFrame(frame) {
+    if (frame.__i18nAttached) return;
+    frame.__i18nAttached = true;
+    frame.addEventListener('load', function () {
+      try {
+        var d = frame.contentDocument;
+        if (!d || !d.body) return;
+        var s = d.createElement('script');
+        s.textContent = '(' + bootFrame.toString() + ')();';
+        (d.head || d.documentElement).appendChild(s);
+      } catch (e) {}
+    });
+  }
+
+  function watchFrames() {
+    var frames = document.querySelectorAll('iframe');
+    for (var i = 0; i < frames.length; i++) attachFrame(frames[i]);
+    if (window.MutationObserver) {
+      new MutationObserver(function (muts) {
+        for (var i = 0; i < muts.length; i++) {
+          var added = muts[i].addedNodes;
+          if (!added) continue;
+          for (var j = 0; j < added.length; j++) {
+            var n = added[j];
+            if (n.nodeType !== 1) continue;
+            if (n.tagName === 'IFRAME') attachFrame(n);
+            if (n.querySelectorAll) {
+              var fs = n.querySelectorAll('iframe');
+              for (var k = 0; k < fs.length; k++) attachFrame(fs[k]);
+            }
+          }
+        }
+      }).observe(document.documentElement, { childList: true, subtree: true });
+    }
+  }
+
   if (document.body) translateAll();
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       translateAll();
       startObserver();
+      watchFrames();
     });
   } else {
     startObserver();
+    watchFrames();
   }
 })();
