@@ -16,7 +16,6 @@
     <span id="pageTitle">Surfrpt Panel</span>
   </div>
   <div class="topbar-actions">
-    <button id="versionBadge" class="version-badge hidden" type="button" title="Version info" onclick="openVersionInfoModal()"></button>
     <button id="themeToggle" type="button" title="Toggle theme" onclick="toggleTheme()">🌙</button>
     <button id="userModeToggle" type="button" onclick="toggleUserMode()"></button>
     <button id="logoutBtn" type="button" title="Log out" onclick="logout()">🚪 Logout</button>
@@ -471,9 +470,7 @@
 </main>
 
 <footer class="footer">
-  <span id="versionFooterText">Surfrpt Panel</span>
-  <span>· <a href="#" onclick="openVersionInfoModal(); return false;">About</a></span>
-  <span>· <a href="#" onclick="openVersionChangelogModal(); return false;">Changelog</a></span>
+  <span id="footerText">Surfrpt Panel</span>
 </footer>
 
 <div class="toast-container" id="toastContainer"></div>
@@ -753,26 +750,6 @@
         </table>
       </div>
     </div>
-  </div>
-</div>
-
-<div class="modal" id="versionInfoModal">
-  <div class="modal-backdrop" onclick="closeModal('versionInfoModal')"></div>
-  <div class="modal-panel">
-    <div class="modal-header"><h2>🚀 About edgetunnel</h2><button type="button" class="modal-close" onclick="closeModal('versionInfoModal')">×</button></div>
-    <div class="modal-body" id="versionInfoBody">
-      <p>edgetunnel is a VLESS/Trojan/SS single-file Cloudflare Workers &amp; Pages proxy panel. This dashboard is a clean-room English rewrite of its admin UI, talking to the same worker backend.</p>
-      <p>Current version: <span id="versionInfoVersion">unknown</span></p>
-      <p><a href="#" onclick="loadVersionChangelog(true); openModal('versionChangelogModal'); return false;">View changelog</a></p>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="versionChangelogModal">
-  <div class="modal-backdrop" onclick="closeModal('versionChangelogModal')"></div>
-  <div class="modal-panel modal-lg">
-    <div class="modal-header"><h2>📜 Changelog</h2><button type="button" class="modal-close" onclick="closeModal('versionChangelogModal')">×</button></div>
-    <div class="modal-body"><div id="changelogBody"><p>Loading…</p></div></div>
   </div>
 </div>
 

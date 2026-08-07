@@ -6,9 +6,6 @@
  * ============================================================ */
 
 /* ---------- Constants ---------- */
-const WORKER_VERSION_SOURCE_URL = 'https://raw.githubusercontent.com/cmliu/edgetunnel/main/_worker.js';
-const PAGES_ZIP_DOWNLOAD_URL = 'https://github.com/cmliu/edgetunnel/archive/refs/heads/main.zip';
-const CHANGELOG_RAW_URL = 'https://raw.githubusercontent.com/cmliu/edgetunnel/refs/heads/main/CHANGELOG';
 const SUBCONFIG_URL = 'https://raw.githubusercontent.com/cmliu/cmliu/main/SUBCONFIG.json';
 const SUBAPI_LIST_URL = 'https://raw.githubusercontent.com/cmliu/cmliu/main/SUBAPI.json';
 const PATH_TEMPLATES_URL = 'https://raw.githubusercontent.com/cmliu/cmliu/main/json/edt-path-config.json';
@@ -47,13 +44,6 @@ let currentProxyFieldId = null;
 let chainProxyFeatureEnabled = true;
 let httpsProxyFeatureEnabled = true;
 let turnSstpProxyFeatureEnabled = true;
-let cachedCurrentVersionFullText = '';
-let cachedCurrentVersionNumber = 0;
-let cachedLatestOnlineVersion = 0;
-let cachedWorkerVersionRawText = '';
-let cachedChangelogRawText = '';
-let cachedChangelogLoadedAt = 0;
-let pendingChangelogLoadPromise = null;
 let simpleMode = false;
 
 /* Network info state */
@@ -203,13 +193,6 @@ async function fetchWithAutoMirror(originalUrl, description = 'resource') {
   } catch (error) {
     throw new Error(`${description} fetch failed (original + ${Math.max(candidates.length - 1, 0)} mirrors)`);
   }
-}
-
-function parseVersionNumber(value) {
-  const digits = String(value ?? '').replace(/\D/g, '');
-  if (!digits) return 0;
-  const parsed = Number(digits);
-  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function formatTime(timestamp) {
@@ -410,12 +393,10 @@ async function loadConfig() {
     currentConfig = await response.json();
     originalConfig = JSON.parse(JSON.stringify(currentConfig));
     renderUI();
-    loadVersionByUUID(currentConfig.UUID);
     const name = currentConfig['优选订阅生成']?.SUBNAME || 'Surfrpt';
     document.title = `${name} — Dashboard`;
     $('pageTitle').textContent = name + ' Panel';
   } catch (error) {
-    updateVersionBadge('');
     showToast('Failed to load config: ' + error.message, 'error');
   }
 }
@@ -574,156 +555,6 @@ function updateCountdown(forceUpdate = false) {
   const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
   const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
   el.textContent = `Reset in ${hours}:${minutes}:${seconds} (UTC)`;
-}
-
-/* ---------- Version ---------- */
-function updateVersionBadge(version) {
-  const badge = $('versionBadge');
-  if (!badge) return;
-  const rawText = String(version ?? '').trim();
-  const digitsOnly = rawText.replace(/\D/g, '');
-  const text = digitsOnly || rawText;
-  if (text) {
-    cachedCurrentVersionFullText = text;
-    cachedCurrentVersionNumber = parseVersionNumber(text);
-    const shortText = text.slice(0, 8);
-    badge.textContent = 'v2.1.' + shortText;
-    badge.classList.remove('hidden');
-    badge.dataset.health = '';
-    badge.title = `Current version: v2.1.${shortText}`;
-  } else {
-    cachedCurrentVersionNumber = 0;
-    cachedCurrentVersionFullText = '';
-    badge.classList.add('hidden');
-    badge.title = 'Current version';
-  }
-}
-
-function setVersionBadgeHealthState(diff) {
-  const badge = $('versionBadge');
-  if (!badge) return;
-  let healthKey = 'outdated';
-  if (diff === 0) healthKey = 'latest';
-  else if (diff > 0) healthKey = 'preview';
-  badge.classList.remove('is-latest', 'is-outdated', 'is-preview');
-  badge.classList.add(healthKey === 'latest' ? 'is-latest' : (healthKey === 'preview' ? 'is-preview' : 'is-outdated'));
-  badge.dataset.health = healthKey;
-  const suffix = healthKey === 'latest' ? ' (latest)' : (healthKey === 'preview' ? ' (preview)' : ' (update needed)');
-  badge.title = `Current version: ${badge.textContent} ${suffix}`;
-}
-
-async function fetchLatestOnlineVersionNumber() {
-  cachedWorkerVersionRawText = '';
-  cachedLatestOnlineVersion = 0;
-  try {
-    const workerText = await fetchWithAutoMirror(WORKER_VERSION_SOURCE_URL + '?_t=' + Date.now(), 'Worker source');
-    cachedWorkerVersionRawText = workerText;
-    const match = workerText.match(/^\s*const\s+Version\s*=\s*['"]([^'"]+)['"]\s*;?/m);
-    cachedLatestOnlineVersion = match ? parseVersionNumber(match[1]) : 0;
-    return cachedLatestOnlineVersion;
-  } catch (error) {
-    cachedLatestOnlineVersion = 0;
-    return 0;
-  }
-}
-
-async function updateVersionBadgeHealthByLatest(currentVersion) {
-  const latest = await fetchLatestOnlineVersionNumber();
-  setVersionBadgeHealthState(parseVersionNumber(currentVersion) - latest);
-}
-
-async function loadVersionByUUID(uuid) {
-  const uuidValue = String(uuid || '').trim();
-  if (!uuidValue) {
-    updateVersionBadge(0);
-    await updateVersionBadgeHealthByLatest(0);
-    return;
-  }
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const response = await fetch(`/version?_t=${Date.now()}&uuid=${encodeURIComponent(uuidValue)}`, {
-        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
-      });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      const data = await response.json();
-      if (!data || typeof data !== 'object' || !('Version' in data)) throw new Error('missing Version field');
-      const version = parseVersionNumber(data.Version);
-      updateVersionBadge(version);
-      await updateVersionBadgeHealthByLatest(version);
-      return;
-    } catch (error) {
-      if (attempt < 3) await new Promise(resolve => setTimeout(resolve, 300));
-    }
-  }
-  updateVersionBadge(0);
-  await updateVersionBadgeHealthByLatest(0);
-}
-
-function openVersionInfoModal() {
-  const badge = $('versionBadge');
-  if (!badge || badge.classList.contains('hidden')) return;
-  const versionEl = $('versionInfoVersion');
-  if (versionEl) versionEl.textContent = badge.textContent || 'unknown';
-  $('versionInfoModal')?.classList.add('show');
-}
-
-function renderChangelogInline(text) {
-  return escapeHtml(text)
-    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
-    .replace(/`([^`]+)`/g, '<code>$1</code>')
-    .replace(/\n/g, '<br>');
-}
-
-function renderChangelogMarkdown(text) {
-  const raw = String(text || '');
-  const lines = raw.split(/\r?\n/);
-  const html = [];
-  for (const line of lines) {
-    if (/^#{2,6}\s/.test(line)) {
-      const level = line.match(/^(#+)\s/)[1].length;
-      const content = line.replace(/^#+\s*/, '');
-      html.push(`<h${level}>${renderChangelogInline(content)}</h${level}>`);
-    } else if (/^\s*[-*]\s/.test(line)) {
-      html.push(`<li>${renderChangelogInline(line.replace(/^\s*[-*]\s/, ''))}</li>`);
-    } else if (/^\s*$/.test(line)) {
-      if (html.length && html[html.length - 1] !== '</ul>') html.push('</ul>');
-    } else if (/^\d+\.\s/.test(line)) {
-      html.push(`<li>${renderChangelogInline(line.replace(/^\d+\.\s/, ''))}</li>`);
-    } else {
-      html.push(`<p>${renderChangelogInline(line)}</p>`);
-    }
-  }
-  return { html: html.join('\n') };
-}
-
-async function loadVersionChangelog(forceReload = false) {
-  const contentEl = $('changelogBody');
-  if (!contentEl) return;
-  if (!forceReload && cachedChangelogRawText) {
-    contentEl.innerHTML = renderChangelogMarkdown(cachedChangelogRawText).html || '<p>No changelog content.</p>';
-    return;
-  }
-  if (pendingChangelogLoadPromise) return pendingChangelogLoadPromise;
-  contentEl.innerHTML = '<p>Loading changelog…</p>';
-  pendingChangelogLoadPromise = (async () => {
-    try {
-      const changelogText = await fetchWithAutoMirror(CHANGELOG_RAW_URL + '?_t=' + Date.now(), 'Changelog');
-      cachedChangelogRawText = changelogText;
-      cachedChangelogLoadedAt = Date.now();
-      contentEl.innerHTML = renderChangelogMarkdown(changelogText).html || '<p>No changelog content.</p>';
-    } catch (error) {
-      contentEl.innerHTML = '<p>Failed to load changelog.</p>';
-    } finally {
-      pendingChangelogLoadPromise = null;
-    }
-  })();
-  return pendingChangelogLoadPromise;
-}
-
-async function openVersionChangelogModal() {
-  $('versionInfoModal')?.classList.remove('show');
-  $('versionChangelogModal')?.classList.add('show');
-  await loadVersionChangelog(false);
 }
 
 /* ---------- Copy & QR ---------- */

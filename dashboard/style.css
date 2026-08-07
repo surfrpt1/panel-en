@@ -55,10 +55,6 @@ button { cursor: pointer; }
   padding: 6px 12px; border-radius: 7px; transition: background .15s;
 }
 .topbar-actions button:hover, .module-actions button:hover, .field-control button:hover, .modal-actions button:hover { background: var(--bg-elevated); }
-.version-badge { font-size: 12px; border-radius: 999px !important; padding: 4px 12px !important; }
-.version-badge.is-latest { color: var(--success); border-color: var(--success) !important; }
-.version-badge.is-outdated { color: var(--danger); border-color: var(--danger) !important; }
-.version-badge.is-preview { color: var(--warning); border-color: var(--warning) !important; }
 .hidden { display: none !important; }
 
 /* Page */
