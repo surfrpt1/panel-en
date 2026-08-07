@@ -74,10 +74,15 @@
   }
 
   var observer = null;
+  function translateAdded(added) {
+    for (var i = 0; i < added.length; i++) {
+      var n = added[i];
+      if (n.nodeType === 1 || n.nodeType === 3) translateNode(n);
+    }
+  }
   function startObserver() {
     if (observer || !window.MutationObserver) return;
     observer = new MutationObserver(function (muts) {
-      var need = false;
       for (var i = 0; i < muts.length; i++) {
         var m = muts[i];
         if (m.type === 'characterData') {
@@ -89,13 +94,9 @@
             var av = el.getAttribute(attrName);
             if (av && hasCJK(av)) el.setAttribute(attrName, translateText(av));
           }
-        } else if (m.type === 'childList') {
-          need = true;
+        } else if (m.type === 'childList' && m.addedNodes && m.addedNodes.length) {
+          translateAdded(m.addedNodes);
         }
-      }
-      if (need) {
-        var b = document.body;
-        if (b) translateNode(b);
       }
     });
     observer.observe(document.documentElement, {
@@ -124,14 +125,16 @@
       if (window.MutationObserver && !window.__i18nObserved) {
         window.__i18nObserved = true;
         new MutationObserver(function (muts) {
-          var need = false;
           for (var i = 0; i < muts.length; i++) {
-            if (muts[i].type === 'childList' || (muts[i].type === 'characterData' && muts[i].target && hasCJK(muts[i].target.nodeValue))) {
-              need = true;
-              break;
+            if (muts[i].type === 'characterData') {
+              if (muts[i].target && muts[i].target.nodeValue && hasCJK(muts[i].target.nodeValue)) tn(muts[i].target);
+            } else if (muts[i].type === 'childList' && muts[i].addedNodes && muts[i].addedNodes.length) {
+              for (var j = 0; j < muts[i].addedNodes.length; j++) {
+                var an = muts[i].addedNodes[j];
+                if (an.nodeType === 1 || an.nodeType === 3) tn(an);
+              }
             }
           }
-          if (need && document.body) tn(document.body);
         }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
       }
     } catch (e) {}
