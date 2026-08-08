@@ -19,15 +19,15 @@ const CHAIN_PROXY_MIN_VERSION = 20260506175102;
 const latencyFetchTimeoutMs = 8000;
 
 const echDNSOptions = [
-  { value: 'https://dns.alidns.com/dns-query', label: '阿里 DoH (推荐)' },
-  { value: 'https://sm2.doh.pub/dns-query', label: '腾讯 DoH' },
+  { value: 'https://dns.alidns.com/dns-query', label: 'AliDNS DoH (Recommended)' },
+  { value: 'https://sm2.doh.pub/dns-query', label: 'Tencent DoH' },
   { value: 'https://doh.360.cn/dns-query', label: '360 DoH' },
   { value: 'https://doh.onedns.net/dns-query', label: 'OneDNS DoH' },
-  { value: 'custom', label: '自定义' }
+  { value: 'custom', label: 'Custom' }
 ];
 const echSNIOptions = [
-  { value: 'cloudflare-ech.com', label: 'cloudflare-ech.com (推荐)' },
-  { value: 'custom', label: '自定义' }
+  { value: 'cloudflare-ech.com', label: 'cloudflare-ech.com (Recommended)' },
+  { value: 'custom', label: 'Custom' }
 ];
 
 /* ---------- State ---------- */
@@ -698,18 +698,22 @@ async function saveSub() {
 function syncSSProtocolSettingsFromConfig() {
   const protocolSelect = $('protocolSelect');
   const hasSSConfig = !!(currentConfig && currentConfig.SS && typeof currentConfig.SS === 'object');
-  const ssOption = protocolSelect.querySelector('option[value="ss"]');
+  if (!protocolSelect.querySelector('option[value="vless"]')) {
+    const vlessOption = document.createElement('option');
+    vlessOption.value = 'vless';
+    vlessOption.textContent = 'VLESS';
+    protocolSelect.insertBefore(vlessOption, protocolSelect.firstChild);
+  }
+  if (!protocolSelect.querySelector('option[value="ss"]')) {
+    const option = document.createElement('option');
+    option.value = 'ss';
+    option.textContent = 'Shadowsocks';
+    protocolSelect.appendChild(option);
+  }
   if (hasSSConfig) {
-    if (!ssOption) {
-      const option = document.createElement('option');
-      option.value = 'ss';
-      option.textContent = 'Shadowsocks';
-      protocolSelect.appendChild(option);
-    }
     $('ssMethodSelect').value = currentConfig.SS['加密方式'] || 'aes-128-gcm';
     $('ssTLSSelect').value = currentConfig.SS.TLS ? 'true' : 'false';
   } else {
-    if (ssOption) ssOption.remove();
     if (protocolSelect.value === 'ss') protocolSelect.value = 'vless';
   }
 }
@@ -779,8 +783,7 @@ function cancelDisableSSTLS() {
 
 function onProtocolChange() {
   const protocol = $('protocolSelect').value;
-  const hasSSConfig = !!(currentConfig && currentConfig.SS && typeof currentConfig.SS === 'object');
-  const showSSFields = hasSSConfig && protocol === 'ss';
+  const showSSFields = protocol === 'ss';
   $('ssSection').style.display = showSSFields ? '' : 'none';
   $('ssTLSRow').style.display = showSSFields ? '' : 'none';
   if (protocol === 'ss') {
@@ -802,7 +805,10 @@ function saveConfig() {
   currentConfig['优选订阅生成'] = subGen;
   currentConfig['协议类型'] = $('protocolSelect').value;
 
-  if (currentConfig.SS && typeof currentConfig.SS === 'object') {
+  if ($('protocolSelect').value === 'ss') {
+    if (!currentConfig.SS || typeof currentConfig.SS !== 'object') {
+      currentConfig.SS = {};
+    }
     currentConfig.SS['加密方式'] = $('ssMethodSelect').value || 'aes-128-gcm';
     currentConfig.SS.TLS = $('ssTLSSelect').value === 'true';
   }
