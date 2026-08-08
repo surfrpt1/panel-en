@@ -773,6 +773,27 @@
   </div>
 </div>
 
+<div class="modal" id="apiOptimizeModal">
+  <div class="modal-backdrop" onclick="closeModal('apiOptimizeModal')"></div>
+  <div class="modal-panel">
+    <div class="modal-header"><h2>🛜 API Optimize</h2><button type="button" class="modal-close" onclick="closeModal('apiOptimizeModal')">×</button></div>
+    <div class="modal-body">
+      <p class="hint">Fetch a preferred IP list from an external subscription API, then append the results to your custom preferred IP list.</p>
+      <div class="field-row"><label>API URL</label><div class="field-control"><input type="text" id="apiOptimizeURL" placeholder="https://EXAMPLE.com/list" oninput="autoConvertGitHubURL(); autoDetectPortFromURL()"></div></div>
+      <div class="field-row"><label>Port</label><div class="field-control"><input type="number" id="apiOptimizePort" min="1" max="65535" value="443"></div></div>
+      <div class="field-row checkbox-row"><label><input type="checkbox" id="useProxyIPCheckbox"> Use ProxyIP</label></div>
+      <div class="modal-actions">
+        <button type="button" id="btnVerifyAPIOptimize" onclick="verifyAPIOptimize()">✔ Verify API</button>
+      </div>
+      <div class="field-row"><label>Results</label><div class="field-control"><textarea id="apiOptimizeResults" rows="8" spellcheck="false" placeholder="1.2.3.4:443&#10;example.com#Remark"></textarea></div></div>
+      <div class="modal-actions">
+        <button type="button" id="btnAppendAPI" onclick="appendAPIToCustom()" disabled>➕ Append API URL</button>
+        <button type="button" id="btnAppendResults" onclick="appendResultsToCustom()" disabled>📋 Append results</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="onlineOptimizeModal">
   <div class="modal-backdrop" onclick="closeOnlineOptimizeModal()"></div>
   <div class="modal-panel modal-full">

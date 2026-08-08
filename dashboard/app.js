@@ -2078,6 +2078,12 @@ function addChainProxyNode() {
 
 /* ---------- API Optimize (subscription interface) ---------- */
 function openAPIOptimizeModal() {
+  $('apiOptimizeURL').value = '';
+  $('apiOptimizePort').value = '443';
+  $('apiOptimizeResults').value = '';
+  $('useProxyIPCheckbox').checked = false;
+  $('btnAppendAPI').disabled = true;
+  $('btnAppendResults').disabled = true;
   $('apiOptimizeModal').classList.add('show');
 }
 

@@ -1836,31 +1836,31 @@
 						</div>
 						<div>
 							<h1>BestCF</h1>
-							<small>在线优选</small>
+							<small>Online Optimization</small>
 						</div>
 					</div>
 				</header>
 
 				<div class="layout">
 					<div class="stack">
-						<section class="network-panel" aria-label="网络环境">
+						<section class="network-panel" aria-label="Network Environment">
 							<div class="network-grid">
 								<article class="network-item" id="ipv4Card">
 									<div class="network-kind">IPv4</div>
 									<div class="network-copy">
-										<strong class="network-address" id="ipv4Value">检测中</strong>
-										<span class="network-note">识别线路</span>
+										<strong class="network-address" id="ipv4Value">Detecting</strong>
+										<span class="network-note">Identifying route</span>
 									</div>
-									<span class="tag idle" id="ipv4Tag">等待</span>
+									<span class="tag idle" id="ipv4Tag">Waiting</span>
 								</article>
 
 								<article class="network-item" id="ipv6Card">
 									<div class="network-kind">IPv6</div>
 									<div class="network-copy">
-										<strong class="network-address" id="ipv6Value">检测中</strong>
-										<span class="network-note">识别线路</span>
+										<strong class="network-address" id="ipv6Value">Detecting</strong>
+										<span class="network-note">Identifying route</span>
 									</div>
-									<span class="tag idle" id="ipv6Tag">等待</span>
+									<span class="tag idle" id="ipv6Tag">Waiting</span>
 								</article>
 							</div>
 						</section>
@@ -1869,12 +1869,12 @@
 					<div class="stack">
 						<section class="panel" aria-labelledby="inputTitle">
 							<div class="panel-head">
-								<h2 class="panel-title" id="inputTitle">待选列表</h2>
+								<h2 class="panel-title" id="inputTitle">Candidate List</h2>
 							</div>
 							<div class="panel-body">
 								<div class="control-row">
 									<div class="field">
-										<label for="librarySelect">IP库</label>
+										<label for="librarySelect">IP Library</label>
 										<select class="select" id="librarySelect" disabled></select>
 									</div>
 									<button class="btn secondary" id="importBtn" type="button" disabled>
@@ -1883,21 +1883,21 @@
 											<path d="M7 10l5 5 5-5"></path>
 											<path d="M12 15V3"></path>
 										</svg>
-										IP库导入
+										Import IP Library
 									</button>
 									<button class="btn" id="latencyBtn" type="button" disabled>
 										<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M5 12h4l3-7 3 14 3-7h1"></path>
 										</svg>
-										优选延迟
+										Optimize Latency
 									</button>
 								</div>
 
 								<details class="settings-block advanced-settings">
 									<summary class="advanced-settings-summary">
 										<span class="advanced-settings-copy">
-											<span class="advanced-settings-title">高级设置</span>
-											<span class="advanced-settings-meta">待测数量、超时、并发、端口</span>
+											<span class="advanced-settings-title">Advanced Settings</span>
+											<span class="advanced-settings-meta">Candidate count, timeout, concurrency, port</span>
 										</span>
 										<svg class="advanced-settings-chevron" viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M6 9l6 6 6-6"></path>
@@ -1906,25 +1906,25 @@
 									<div class="advanced-settings-body">
 										<div class="form-grid compact">
 											<div class="field">
-												<label for="limitInput">待测IP数</label>
+												<label for="limitInput">IPs to test</label>
 												<input class="input" id="limitInput" type="number" min="1" max="4096"
 													step="1" value="512">
 											</div>
 											<div class="field">
-												<label for="timeoutInput">超时时间 ms</label>
+												<label for="timeoutInput">Timeout (ms)</label>
 												<input class="input" id="timeoutInput" type="number" min="100"
 													max="10000" step="50" value="500">
 											</div>
 											<div class="field">
-												<label for="threadsInput">并发线程</label>
+												<label for="threadsInput">Concurrent threads</label>
 												<input class="input" id="threadsInput" type="number" min="1" max="32"
 													step="1" value="16">
 											</div>
 											<div class="field">
 												<div class="label-row">
-													<label for="portInput">优选端口</label>
-													<span class="help-tip" tabindex="0" role="img" aria-label="端口说明"
-														data-tip="端口为 0 时，随机设置 443、2053、2083、2087、2096、8443 端口。">!</span>
+													<label for="portInput">Preferred port</label>
+													<span class="help-tip" tabindex="0" role="img" aria-label="Port description"
+														data-tip="When the port is 0, a random port from 443, 2053, 2083, 2087, 2096, 8443 is used.">!</span>
 												</div>
 												<input class="input" id="portInput" type="number" min="0" max="65535"
 													step="1" value="0">
@@ -1935,9 +1935,9 @@
 
 								<div class="editor">
 									<div class="editor-bar">
-										<span class="editor-count" id="lineCount">0 行</span>
-										<button class="icon-btn" id="clearBtn" type="button" title="清空列表"
-											aria-label="清空列表">
+										<span class="editor-count" id="lineCount">0 lines</span>
+										<button class="icon-btn" id="clearBtn" type="button" title="Clear list"
+											aria-label="Clear list">
 											<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
 												<path d="M3 6h18"></path>
 												<path d="M8 6V4h8v2"></path>
@@ -1956,14 +1956,14 @@
 												<div class="shade-line"></div>
 											</div>
 											<textarea id="ipInput" spellcheck="false"
-												placeholder="IP格式:&#10;1.0.0.0:443&#10;[2606:4700::0]:443&#10;&#10;CIDR格式:&#10;103.22.200.0/22&#10;2606:4700::/32&#10;&#10;IP区间:&#10;162.159.152.0-162.159.153.255&#10;2606:4700::1-2606:4700::9999"></textarea>
+												placeholder="IP format:&#10;1.0.0.0:443&#10;[2606:4700::0]:443&#10;&#10;CIDR format:&#10;103.22.200.0/22&#10;2606:4700::/32&#10;&#10;IP range:&#10;162.159.152.0-162.159.153.255&#10;2606:4700::1-2606:4700::9999"></textarea>
 										</div>
 									</div>
 								</div>
 
 								<div class="progress">
 									<div class="progress-meta">
-										<span class="tiny muted" id="latencyStatus">等待网络检测</span>
+										<span class="tiny muted" id="latencyStatus">Waiting for network detection</span>
 										<span class="tiny muted" id="progressText">0 / 0</span>
 									</div>
 									<div class="progress-line" aria-hidden="true">
@@ -1975,60 +1975,60 @@
 
 						<section class="panel" aria-labelledby="resultTitle">
 							<div class="panel-head">
-								<h2 class="panel-title" id="resultTitle">优选结果</h2>
-								<span class="tag idle" id="resultCount">0 个可用</span>
+								<h2 class="panel-title" id="resultTitle">Preferred Results</h2>
+								<span class="tag idle" id="resultCount">0 available</span>
 							</div>
 							<div class="result-wrap">
 								<table>
 									<thead>
 										<tr>
 											<th class="selection-cell"><input id="selectAllHeader" type="checkbox"
-													title="全选" aria-label="全选"></th>
+													title="Select all" aria-label="Select all"></th>
 											<th style="width: 24%"><button class="sort-header" type="button"
-													data-sort="address">优选IP <span class="sort-mark"
+													data-sort="address">Preferred IP <span class="sort-mark"
 														data-sort-mark="address"></span></button></th>
 											<th class="filterable-header" style="width: 11%"><button class="sort-header"
 													type="button" data-sort="ipType"><span class="filter-header-label"
-														role="button" tabindex="0" data-filter-key="ipType">IP类型</span>
+														role="button" tabindex="0" data-filter-key="ipType">IP Type</span>
 													<span class="sort-mark" data-sort-mark="ipType"></span></button>
 											</th>
 											<th class="filterable-header" style="width: 14%"><button class="sort-header"
 													type="button" data-sort="type"><span class="filter-header-label"
-														role="button" tabindex="0" data-filter-key="type">优选类型</span>
+														role="button" tabindex="0" data-filter-key="type">Preferred Type</span>
 													<span class="sort-mark" data-sort-mark="type"></span></button></th>
 											<th class="filterable-header" style="width: 13%"><button class="sort-header"
 													type="button" data-sort="country"><span class="filter-header-label"
-														role="button" tabindex="0" data-filter-key="country">国家地区</span>
+														role="button" tabindex="0" data-filter-key="country">Country/Region</span>
 													<span class="sort-mark" data-sort-mark="country"></span></button>
 											</th>
 											<th class="filterable-header" style="width: 10%"><button class="sort-header"
 													type="button" data-sort="colo"><span class="filter-header-label"
-														role="button" tabindex="0" data-filter-key="colo">数据中心</span>
+														role="button" tabindex="0" data-filter-key="colo">Data Center</span>
 													<span class="sort-mark" data-sort-mark="colo"></span></button></th>
 											<th style="width: 13%"><button class="sort-header" type="button"
-													data-sort="latency">延迟(ms) <span class="sort-mark"
+													data-sort="latency">Latency (ms) <span class="sort-mark"
 														data-sort-mark="latency"></span></button></th>
 											<th style="width: 15%"><button class="sort-header" type="button"
-													data-sort="speed">速度(Mbps) <span class="sort-mark"
+													data-sort="speed">Speed (Mbps) <span class="sort-mark"
 														data-sort-mark="speed"></span></button></th>
 										</tr>
 									</thead>
 									<tbody id="resultBody">
 										<tr>
-											<td class="empty" colspan="8">暂无结果</td>
+											<td class="empty" colspan="8">No results yet</td>
 										</tr>
 									</tbody>
 								</table>
 							</div>
 							<div class="result-actions">
 								<div class="result-actions-group">
-									<button class="btn secondary" id="invertSelectBtn" type="button">反选</button>
-									<button class="btn secondary" id="clearSelectBtn" type="button">重置</button>
+									<button class="btn secondary" id="invertSelectBtn" type="button">Invert</button>
+									<button class="btn secondary" id="clearSelectBtn" type="button">Reset</button>
 								</div>
 								<div class="result-actions-group">
-									<span class="tiny muted selection-status" id="selectionStatus">已选 0 个</span>
-									<button class="btn success" id="saveSelectedBtn" type="button" disabled>保存</button>
-									<button class="btn secondary" id="closeBestCFBtn" type="button">关闭</button>
+									<span class="tiny muted selection-status" id="selectionStatus">0 selected</span>
+									<button class="btn success" id="saveSelectedBtn" type="button" disabled>Save</button>
+									<button class="btn secondary" id="closeBestCFBtn" type="button">Close</button>
 								</div>
 							</div>
 						</section>
@@ -2036,8 +2036,8 @@
 				</div>
 
 				<p class="bestcf-credit">
-					© BestCF · 在线优选得以实现，离不开巨人的肩膀。感谢 @ktff、@Lfreea、<a href="https://hidoha.net" target="_blank"
-						rel="noopener noreferrer">HiDNS</a> 的探索与贡献。
+					© BestCF · BestCF online optimization stands on the shoulders of giants. Thanks to the exploration and contributions of @ktff, @Lfreea, and <a href="https://hidoha.net" target="_blank"
+						rel="noopener noreferrer">HiDNS</a>.
 				</p>
 			</main>
 
@@ -2045,17 +2045,17 @@
 				aria-labelledby="networkWarningTitle">
 				<div class="network-warning-modal" id="networkWarningModal">
 					<div class="network-warning-body">
-						<div class="network-warning-heading" id="networkWarningHeading">红牌警告</div>
-						<div class="network-warning-title" id="networkWarningTitle">检测到当前网络出口不是 CN 直连</div>
+						<div class="network-warning-heading" id="networkWarningHeading">Red Card Warning</div>
+						<div class="network-warning-title" id="networkWarningTitle">Detected that the current network egress is not a CN direct connection</div>
 						<div class="network-warning-message" id="networkWarningMessage"></div>
 						<div class="network-warning-summary" id="networkWarningSummary"></div>
 						<details class="network-warning-details" id="networkWarningDetails" hidden>
-							<summary>查看详细响应内容</summary>
+							<summary>View detailed response</summary>
 							<pre class="network-warning-json" id="networkWarningJson"></pre>
 						</details>
 					</div>
 					<div class="network-warning-actions">
-						<button class="btn" id="networkWarningConfirmBtn" type="button">确定</button>
+						<button class="btn" id="networkWarningConfirmBtn" type="button">Confirm</button>
 					</div>
 				</div>
 			</div>
@@ -2105,24 +2105,24 @@
 					return endpoints.map(ep => ep.replace(/\*\*/g, () => Math.floor(Math.random() * 255 + 1).toString(16).padStart(2, '0')));
 				}
 				const IP_LIBRARIES = [
-					{ label: "CF官方列表v4", family: "ipv4", url: "https://cf.090227.xyz/ips-v4" },
-					{ label: "CF官方列表v6", family: "ipv6", url: "https://cf.090227.xyz/ips-v6" },
-					{ label: "CM优选列表v4", family: "ipv4", url: "https://raw.githubusercontent.com/cmliu/cmliu/main/CF-CIDR.txt" },
-					{ label: "AS13335列表v4", family: "ipv4", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/13335/ipv4-aggregated.txt" },
-					{ label: "AS13335列表v6", family: "ipv6", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/13335/ipv6-aggregated.txt" },
-					{ label: "AS209242列表v4", family: "ipv4", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/209242/ipv4-aggregated.txt" },
-					{ label: "AS209242列表v6", family: "ipv6", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/209242/ipv6-aggregated.txt" }
+					{ label: "CF Official List v4", family: "ipv4", url: "https://cf.090227.xyz/ips-v4" },
+					{ label: "CF Official List v6", family: "ipv6", url: "https://cf.090227.xyz/ips-v6" },
+					{ label: "CM Preferred List v4", family: "ipv4", url: "https://raw.githubusercontent.com/cmliu/cmliu/main/CF-CIDR.txt" },
+					{ label: "AS13335 List v4", family: "ipv4", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/13335/ipv4-aggregated.txt" },
+					{ label: "AS13335 List v6", family: "ipv6", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/13335/ipv6-aggregated.txt" },
+					{ label: "AS209242 List v4", family: "ipv4", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/209242/ipv4-aggregated.txt" },
+					{ label: "AS209242 List v6", family: "ipv6", url: "https://raw.githubusercontent.com/ipverse/asn-ip/master/as/209242/ipv6-aggregated.txt" }
 				];
 				const LIBRARY_SELECTION_CACHE_KEY = "bestcf:selected-ip-library";
 				const SAVE_EASTER_SHAKE_DELAY_MS = 618;
 				const SAVE_EASTER_EXPORT_DELAY_MS = 1000;
-				const CANDIDATE_INPUT_ERROR_MESSAGE = "待选列表为空或格式不符合要求，请输入有效的 IP、CIDR 或 IP 区间，或导入 IP 库后再进行优选。";
+				const CANDIDATE_INPUT_ERROR_MESSAGE = "The candidate list is empty or the format is invalid. Please enter a valid IP, CIDR, or IP range, or import an IP library before optimizing.";
 				const RESULT_FILTER_KEYS = ["ipType", "type", "country", "colo"];
 				const RESULT_FILTER_LABELS = {
-					ipType: "IP类型",
-					type: "优选类型",
-					country: "国家/地区",
-					colo: "数据中心"
+					ipType: "IP Type",
+					type: "Preferred Type",
+					country: "Country/Region",
+					colo: "Data Center"
 				};
 
 				const state = {
@@ -2226,7 +2226,7 @@
 						if (!await ensureCnNetworkBeforeAction({
 							button: els.latencyBtn,
 							statusEl: els.latencyStatus,
-							idleHtml: `${svgPulseIcon()}优选延迟`
+							idleHtml: `${svgPulseIcon()}Optimize Latency`
 						})) return;
 						startLatencyRun();
 					});
@@ -2240,7 +2240,7 @@
 							if (!await ensureCnNetworkBeforeAction({
 								button: els.speedAllBtn,
 								statusEl: els.speedStatus,
-								idleHtml: `${svgBoltIcon()}全部测速`
+								idleHtml: `${svgBoltIcon()}Test All Speeds`
 							})) return;
 							startAllSpeedTests();
 						});
@@ -2359,15 +2359,15 @@
 
 				async function ensureCnNetworkBeforeAction({ button, statusEl, idleHtml }) {
 					if (state.networkChecking) return false;
-					if (button) button.innerHTML = `${svgPulseIcon()}网络验证`;
-					if (statusEl) statusEl.textContent = "正在检测CN网络";
+					if (button) button.innerHTML = `${svgPulseIcon()}Network Check`;
+					if (statusEl) statusEl.textContent = "Checking CN network";
 					const allowed = await refreshCnNetwork({ resetResults: false, stopRuns: false });
 					if (!allowed) {
 						if (button && idleHtml) button.innerHTML = idleHtml;
-						if (statusEl) statusEl.textContent = "检测未通过，请关闭代理后重试";
+						if (statusEl) statusEl.textContent = "Check failed. Please disable the proxy and try again.";
 						return false;
 					}
-					if (statusEl) statusEl.textContent = "CN网络检测通过";
+					if (statusEl) statusEl.textContent = "CN network check passed";
 					return true;
 				}
 
@@ -2417,7 +2417,7 @@
 							} else {
 								state.network[family] = {
 									status: "failed",
-									error: result.reason && result.reason.message ? result.reason.message : "不具备优选条件"
+									error: result.reason && result.reason.message ? result.reason.message : "Not eligible for optimization"
 								};
 							}
 						});
@@ -2454,9 +2454,9 @@
 					if (nonCn.length) {
 						return {
 							kind: "non-cn",
-							heading: "红牌警告",
-							title: "检测到当前网络出口不是 CN 直连",
-							message: "请确认浏览器当前网络是否经过了 代理、VPN 或 境外网络，\n在线优选仅有 CN 直连网络环境才可以实现！",
+							heading: "Red Card Warning",
+							title: "Detected that the current network egress is not a CN direct connection",
+							message: "Please confirm whether your browser network goes through a proxy, VPN, or overseas network.\nOnline optimization only works in a CN direct connection network environment!",
 							rows: nonCn,
 							details: completed
 						};
@@ -2464,9 +2464,9 @@
 
 					return {
 						kind: "request-failed",
-						heading: "检测失败",
-						title: "优选域名请求失败",
-						message: "优选域名请求失败，自行检查网络环境，确保优选域名可访问。",
+						heading: "Detection Failed",
+						title: "Preferred domain request failed",
+						message: "The preferred domain request failed. Check your network environment to ensure the preferred domain is accessible.",
 						rows: entries,
 						details: completed
 					};
@@ -2501,21 +2501,21 @@
 				}
 
 				function renderNetworkWarningNonCnRow(family, info) {
-					const ip = info && info.ip ? info.ip : "未获取";
-					const country = info && info.country ? String(info.country).toUpperCase() : "未知";
+					const ip = info && info.ip ? info.ip : "Not obtained";
+					const country = info && info.country ? String(info.country).toUpperCase() : "Unknown";
 					return `<div class="network-warning-row">
 						<span class="network-warning-family">${escapeHtml(family.toUpperCase())}</span>
 						<span class="network-warning-ip">${escapeHtml(ip)}</span>
-						<span class="network-warning-country">地区代码 ${escapeHtml(country)}</span>
+						<span class="network-warning-country">Region code ${escapeHtml(country)}</span>
 					</div>`;
 				}
 
 				function renderNetworkWarningFailedRow(family, info) {
-					const error = info && info.error ? info.error : "请求失败";
+					const error = info && info.error ? info.error : "Request failed";
 					return `<div class="network-warning-row">
 						<span class="network-warning-family">${escapeHtml(family.toUpperCase())}</span>
 						<span class="network-warning-ip">${escapeHtml(error)}</span>
-						<span class="network-warning-country">失败</span>
+						<span class="network-warning-country">Failed</span>
 					</div>`;
 				}
 
@@ -2548,7 +2548,7 @@
 						endpoint,
 						ip: data.ip || "",
 						ipType: data.ipType || family,
-						country: data.country || "未知",
+						country: data.country || "Unknown",
 						cnIspCode: data.cnIspCode || "",
 						preferredType: preferredTypeFromCnIspCode(data.cnIspCode),
 						colo: data.colo || "",
@@ -2564,7 +2564,7 @@
 
 					try {
 						const { data: locations } = await fetchJsonFromFastestEndpoint([...new Set(endpoints)], "locations", 8000);
-						if (!Array.isArray(locations)) throw new Error("locations 响应格式无效");
+						if (!Array.isArray(locations)) throw new Error("locations response format invalid");
 						state.locations = locations;
 						state.locationsByIata = new Map(
 							locations
@@ -2587,30 +2587,30 @@
 					if (!info || info.status === "loading") {
 						card.classList.remove("is-hidden");
 						card.classList.add("is-loading");
-						value.textContent = "检测中";
-						if (note) note.textContent = "识别线路";
+						value.textContent = "Detecting";
+						if (note) note.textContent = "Identifying route";
 						tag.className = "tag idle";
-						tag.textContent = "等待";
+						tag.textContent = "Waiting";
 						return;
 					}
 
 					if (info.status === "failed") {
 						card.classList.remove("is-hidden");
 						card.classList.add("is-failed");
-						value.textContent = "不具备优选条件";
-						if (note) note.textContent = "线路不可用";
+						value.textContent = "Not eligible for optimization";
+						if (note) note.textContent = "Route unavailable";
 						tag.className = "tag bad";
-						tag.textContent = "未就绪";
+						tag.textContent = "Not ready";
 						return;
 					}
 
 					if (!info.allowed) {
 						card.classList.add("is-hidden");
 						card.classList.add("is-unavailable");
-						value.textContent = "不可用";
-						if (note) note.textContent = "非CN网络";
+						value.textContent = "Unavailable";
+						if (note) note.textContent = "Non-CN network";
 						tag.className = "tag bad";
-						tag.textContent = info.country || "非CN";
+						tag.textContent = info.country || "Non-CN";
 						return;
 					}
 
@@ -2619,37 +2619,37 @@
 					value.textContent = maskIpForDisplay(info.ip, info.ipType || family);
 					if (note) note.textContent = info.preferredType || preferredTypeFromCnIspCode(info.cnIspCode);
 					tag.className = "tag ok";
-					tag.textContent = `${info.country || "未知"} · ${String(info.cnIspCode || "unknown").toUpperCase()}`;
+					tag.textContent = `${info.country || "Unknown"} · ${String(info.cnIspCode || "unknown").toUpperCase()}`;
 				}
 
 				function maskIpForDisplay(ip, family) {
-					if (!ip) return "未获取";
+					if (!ip) return "Not obtained";
 					if (family === "ipv6") return maskIpv6ForDisplay(ip);
 					return maskIpv4ForDisplay(ip);
 				}
 
 				function maskIpv4ForDisplay(ip) {
 					const parts = ip.split(".");
-					if (parts.length !== 4) return "已脱敏";
+					if (parts.length !== 4) return "Masked";
 					return `${parts[0]}.***.**.${parts[3]}`;
 				}
 
 				function maskIpv6ForDisplay(ip) {
 					const normalized = normalizeIpv6(ip);
-					if (!normalized) return "已脱敏";
+					if (!normalized) return "Masked";
 					const groups = expandIpv6Groups(normalized);
-					if (!groups) return "已脱敏";
+					if (!groups) return "Masked";
 					return `${groups[0]}:****:****:${groups[7]}`;
 				}
 
 				function updateServiceStatus() {
 					const available = availableFamilies();
 					if (available.length === 0) {
-						els.latencyStatus.textContent = "网络不可用";
+						els.latencyStatus.textContent = "Network unavailable";
 						return;
 					}
 
-					els.latencyStatus.textContent = "等待优选";
+					els.latencyStatus.textContent = "Waiting to optimize";
 				}
 
 				function availableFamilies() {
@@ -2701,7 +2701,7 @@
 					els.librarySelect.innerHTML = "";
 					if (!options.length) {
 						const option = document.createElement("option");
-						option.textContent = "无可用IP库";
+						option.textContent = "No IP library available";
 						option.value = "";
 						els.librarySelect.appendChild(option);
 						els.librarySelect.disabled = true;
@@ -2750,14 +2750,14 @@
 					if (!option || !option.dataset.url) return;
 					els.importBtn.disabled = true;
 					const original = els.importBtn.innerHTML;
-					els.importBtn.textContent = "导入中";
+					els.importBtn.textContent = "Importing";
 					try {
 						const text = await fetchText(`${option.dataset.url}${option.dataset.url.includes("?") ? "&" : "?"}_t=${Date.now()}`, 20000);
 						els.ipInput.value = text.trim();
 						updateEditorMeta();
-						els.latencyStatus.textContent = `已导入 ${option.textContent}`;
+						els.latencyStatus.textContent = `Imported ${option.textContent}`;
 					} catch (error) {
-						els.latencyStatus.textContent = `导入失败：${friendlyError(error)}`;
+						els.latencyStatus.textContent = `Import failed: ${friendlyError(error)}`;
 					} finally {
 						els.importBtn.innerHTML = original;
 						els.importBtn.disabled = false;
@@ -2767,7 +2767,7 @@
 				function updateEditorMeta() {
 					const value = els.ipInput.value;
 					const lines = value.length ? value.split(/\r\n|\r|\n/).length : 0;
-					els.lineCount.textContent = `${lines} 行`;
+					els.lineCount.textContent = `${lines} lines`;
 					const displayLines = Math.max(1, lines);
 					els.lineNumbers.textContent = Array.from({ length: displayLines }, (_, index) => index + 1).join("\n");
 					const visibleLines = Math.ceil((els.ipInput.clientHeight || 360) / 22) + 2;
@@ -2791,7 +2791,7 @@
 					} catch (error) {
 						const message = friendlyError(error);
 						els.latencyStatus.textContent = message;
-						els.latencyBtn.innerHTML = `${svgPulseIcon()}优选延迟`;
+						els.latencyBtn.innerHTML = `${svgPulseIcon()}Optimize Latency`;
 						showOptimizeToast(message);
 						return;
 					}
@@ -2813,8 +2813,8 @@
 					};
 					state.latencyRun = run;
 					els.latencyBtn.classList.add("danger");
-					els.latencyBtn.innerHTML = `${svgStopIcon()}停止优选`;
-					els.latencyStatus.textContent = `正在优选 ${candidates.length} 个地址`;
+					els.latencyBtn.innerHTML = `${svgStopIcon()}Stop Optimizing`;
+					els.latencyStatus.textContent = `Optimizing ${candidates.length} addresses`;
 					setProgress(0, candidates.length);
 					updateActionAvailability();
 
@@ -2837,13 +2837,13 @@
 					}, run);
 
 					if (run.stopped) {
-						els.latencyStatus.textContent = `已停止，保留 ${state.results.length} 个结果`;
+						els.latencyStatus.textContent = `Stopped, keeping ${state.results.length} results`;
 					} else {
-						els.latencyStatus.textContent = `优选完成，${state.results.length} 个可用`;
+						els.latencyStatus.textContent = `Optimization complete, ${state.results.length} available`;
 					}
 					state.latencyRun = null;
 					els.latencyBtn.classList.remove("danger");
-					els.latencyBtn.innerHTML = `${svgPulseIcon()}优选延迟`;
+					els.latencyBtn.innerHTML = `${svgPulseIcon()}Optimize Latency`;
 					updateActionAvailability();
 					renderResults();
 				}
@@ -2853,26 +2853,26 @@
 					if (!run) return;
 					run.stopped = true;
 					for (const controller of run.controllers) controller.abort();
-					els.latencyStatus.textContent = "正在停止优选";
+					els.latencyStatus.textContent = "Stopping optimization";
 				}
 
 				async function testLatency(address, timeout, run) {
 					const parsed = parseAddressWithPort(address);
-					if (!parsed) throw new Error("地址格式无效");
+					if (!parsed) throw new Error("Invalid address format");
 					const url = buildProbeUrl(parsed, "ip.json");
 
 					await testOptionsConnectivity(url, timeout * 2, run);
 
 					const started = performance.now();
 					const response = await fetchWithTimeout(url, { method: "GET", timeout, run });
-					if (!response.ok) throw new Error("GET 不可用");
+					if (!response.ok) throw new Error("GET unavailable");
 					const data = await response.json();
 					const latency = Math.max(1, Math.round(performance.now() - started));
-					if (latency > timeout) throw new Error("延迟超过超时时间");
+					if (latency > timeout) throw new Error("Latency exceeds the timeout");
 					const official = isOfficialPreferredIp(data);
 					const responseIpType = data.ipType || "";
-					const type = official ? officialPreferredType(data) : "优选反代";
-					const country = official ? countryFromColo(data.colo) : (data.country || "未知");
+					const type = official ? officialPreferredType(data) : "Preferred Reverse Proxy";
+					const country = official ? countryFromColo(data.colo) : (data.country || "Unknown");
 
 					return {
 						address,
@@ -2908,11 +2908,11 @@
 				function preferredTypeFromCnIspCode(cnIspCode) {
 					const normalizedCode = normalizeCnIspCode(cnIspCode);
 					const typeMap = {
-						ct: "电信优选",
-						cu: "联通优选",
-						cmcc: "移动优选"
+						ct: "Telecom Preferred",
+						cu: "Unicom Preferred",
+						cmcc: "Mobile Preferred"
 					};
-					return typeMap[normalizedCode] || "官方优选";
+					return typeMap[normalizedCode] || "Official Preferred";
 				}
 
 				function officialResultFamily(data) {
@@ -2954,7 +2954,7 @@
 				async function testOptionsConnectivity(url, timeout, run) {
 					let lastError = null;
 					for (let attempt = 0; attempt < 3; attempt += 1) {
-						if (run && run.stopped) throw new Error("已停止");
+						if (run && run.stopped) throw new Error("Stopped");
 						try {
 							const response = await fetchWithTimeout(url, { method: "OPTIONS", timeout, run });
 							if (response.ok) return;
@@ -2964,13 +2964,13 @@
 							if (run && run.stopped) throw error;
 						}
 					}
-					throw lastError || new Error("OPTIONS 不可用");
+					throw lastError || new Error("OPTIONS unavailable");
 				}
 
 				function countryFromColo(colo) {
-					if (!colo) return "未知";
+					if (!colo) return "Unknown";
 					const match = state.locationsByIata.get(String(colo).toUpperCase());
-					return match && match.cca2 ? match.cca2 : "未知";
+					return match && match.cca2 ? match.cca2 : "Unknown";
 				}
 
 				async function startSingleSpeedTest(index) {
@@ -3014,9 +3014,9 @@
 					state.speedRun = run;
 					if (els.speedAllBtn) {
 						els.speedAllBtn.classList.add("danger");
-						els.speedAllBtn.innerHTML = `${svgStopIcon()}停止测速`;
+						els.speedAllBtn.innerHTML = `${svgStopIcon()}Stop Speed Test`;
 					}
-					if (els.speedStatus) els.speedStatus.textContent = `正在测速 0 / ${run.total}`;
+					if (els.speedStatus) els.speedStatus.textContent = `Speed testing 0 / ${run.total}`;
 					updateActionAvailability();
 
 					targets.forEach(({ result }) => {
@@ -3044,7 +3044,7 @@
 						} finally {
 							result.speedRemaining = null;
 							run.completed += 1;
-							if (els.speedStatus) els.speedStatus.textContent = `正在测速 ${run.completed} / ${run.total}`;
+							if (els.speedStatus) els.speedStatus.textContent = `Speed testing ${run.completed} / ${run.total}`;
 							renderResults();
 						}
 					}, run);
@@ -3053,15 +3053,15 @@
 						targets.forEach(({ result }) => {
 							if (result.speedState === "pending" || result.speedState === "testing") result.speedState = "stopped";
 						});
-						if (els.speedStatus) els.speedStatus.textContent = "批量测速已停止";
+						if (els.speedStatus) els.speedStatus.textContent = "Batch speed test stopped";
 					} else {
-						if (els.speedStatus) els.speedStatus.textContent = "批量测速完成";
+						if (els.speedStatus) els.speedStatus.textContent = "Batch speed test complete";
 					}
 
 					state.speedRun = null;
 					if (els.speedAllBtn) {
 						els.speedAllBtn.classList.remove("danger");
-						els.speedAllBtn.innerHTML = `${svgBoltIcon()}全部测速`;
+						els.speedAllBtn.innerHTML = `${svgBoltIcon()}Test All Speeds`;
 					}
 					renderResults();
 					updateActionAvailability();
@@ -3135,9 +3135,9 @@
 					state.speedRun = run;
 					if (els.speedAllBtn) {
 						els.speedAllBtn.classList.add("danger");
-						els.speedAllBtn.innerHTML = `${svgStopIcon()}停止测速`;
+						els.speedAllBtn.innerHTML = `${svgStopIcon()}Stop Speed Test`;
 					}
-					if (els.speedStatus) els.speedStatus.textContent = `正在测速 0 / ${run.total}`;
+					if (els.speedStatus) els.speedStatus.textContent = `Speed testing 0 / ${run.total}`;
 					updateActionAvailability();
 
 					state.results.forEach((item) => {
@@ -3165,7 +3165,7 @@
 						} finally {
 							result.speedRemaining = null;
 							run.completed += 1;
-							if (els.speedStatus) els.speedStatus.textContent = `正在测速 ${run.completed} / ${run.total}`;
+							if (els.speedStatus) els.speedStatus.textContent = `Speed testing ${run.completed} / ${run.total}`;
 							renderResults();
 						}
 					}, run);
@@ -3174,15 +3174,15 @@
 						state.results.forEach((item) => {
 							if (item.speedState === "pending" || item.speedState === "testing") item.speedState = "stopped";
 						});
-						if (els.speedStatus) els.speedStatus.textContent = "测速已停止";
+						if (els.speedStatus) els.speedStatus.textContent = "Speed test stopped";
 					} else {
-						if (els.speedStatus) els.speedStatus.textContent = "全部测速完成";
+						if (els.speedStatus) els.speedStatus.textContent = "All speed tests complete";
 					}
 
 					state.speedRun = null;
 					if (els.speedAllBtn) {
 						els.speedAllBtn.classList.remove("danger");
-						els.speedAllBtn.innerHTML = `${svgBoltIcon()}全部测速`;
+						els.speedAllBtn.innerHTML = `${svgBoltIcon()}Test All Speeds`;
 					}
 					renderResults();
 					updateActionAvailability();
@@ -3193,7 +3193,7 @@
 					if (!run) return;
 					run.stopped = true;
 					for (const controller of run.controllers) controller.abort();
-					if (els.speedStatus) els.speedStatus.textContent = "正在停止测速";
+					if (els.speedStatus) els.speedStatus.textContent = "Stopping speed test";
 				}
 
 				async function testDownloadSpeed(parsed, run, onProgress) {
@@ -3239,7 +3239,7 @@
 							cache: "no-store",
 							signal: controller.signal
 						});
-						if (!response.ok) throw new Error("下载失败");
+						if (!response.ok) throw new Error("Download failed");
 
 						if (!response.body || !response.body.getReader) {
 							const buffer = await response.arrayBuffer();
@@ -3283,14 +3283,14 @@
 					const hasActiveFilter = hasActiveResultFilters();
 					syncSpeedTestingTimer();
 					els.resultCount.textContent = hasActiveFilter
-						? `${rows.length} / ${state.results.length} 个可用`
-						: `${state.results.length} 个可用`;
+						? `${rows.length} / ${state.results.length} available`
+						: `${state.results.length} available`;
 					renderSortMarks();
 					renderFilterHeaderState();
 					syncOpenResultFilterMenu();
 					syncSelectionWithResults();
 					if (!state.results.length || !rows.length) {
-						els.resultBody.innerHTML = `<tr><td class="empty" colspan="8">${state.results.length ? "筛选后暂无结果" : "暂无结果"}</td></tr>`;
+						els.resultBody.innerHTML = `<tr><td class="empty" colspan="8">${state.results.length ? "No results after filtering" : "No results yet"}</td></tr>`;
 						updateSelectionState();
 						updateActionAvailability();
 						return;
@@ -3301,12 +3301,12 @@
 						const selected = state.selectedIds.has(id);
 						const safeAddress = escapeHtml(item.address);
 						return `<tr class="result-row${selected ? " is-selected" : ""}" data-result-id="${escapeHtml(id)}">
-		  <td class="selection-cell"><input type="checkbox" data-select-id="${escapeHtml(id)}" aria-label="选择 ${safeAddress}" ${selected ? "checked" : ""}></td>
-		  <td class="ip-cell"><button class="copy-address-btn" type="button" data-copy-address="${safeAddress}" title="点击复制" aria-label="复制 ${safeAddress}">${safeAddress}</button></td>
-		  <td>${escapeHtml(item.ipType || "未知")}</td>
+		  <td class="selection-cell"><input type="checkbox" data-select-id="${escapeHtml(id)}" aria-label="Select ${safeAddress}" ${selected ? "checked" : ""}></td>
+		  <td class="ip-cell"><button class="copy-address-btn" type="button" data-copy-address="${safeAddress}" title="Click to copy" aria-label="Copy ${safeAddress}">${safeAddress}</button></td>
+		  <td>${escapeHtml(item.ipType || "Unknown")}</td>
 		  <td>${escapeHtml(item.type)}</td>
 		  <td>${renderCountryCell(item.country)}</td>
-		  <td>${escapeHtml(item.colo || "未知")}</td>
+		  <td>${escapeHtml(item.colo || "Unknown")}</td>
 		  <td>${item.latency}ms</td>
 		  <td>${renderSpeedCell(item, index)}</td>
 		</tr>`;
@@ -3353,7 +3353,7 @@
 					const total = visibleIds.length;
 					const selected = state.selectedIds.size;
 					const visibleSelected = visibleIds.filter((id) => state.selectedIds.has(id)).length;
-					els.selectionStatus.textContent = `已选 ${selected} 个`;
+					els.selectionStatus.textContent = `${selected} selected`;
 					const saveLocked = state.results.length > 0 && selected === 0;
 					els.saveSelectedBtn.disabled = state.results.length === 0;
 					els.saveSelectedBtn.classList.toggle("is-save-locked", saveLocked);
@@ -3365,7 +3365,7 @@
 					els.selectAllHeader.indeterminate = visibleSelected > 0 && visibleSelected < total;
 					if (state.results.length === 0) finishSaveSelectedLongPress();
 					if (state.saveEasterHold && state.saveEasterHold.shaking && !state.saveEasterHold.exported) {
-						els.selectionStatus.textContent = "继续按住可导出 CSV";
+						els.selectionStatus.textContent = "Keep holding to export CSV";
 					}
 				}
 
@@ -3540,7 +3540,7 @@
 						hold.shaking = true;
 						state.suppressNextSaveClick = true;
 						els.saveSelectedBtn.classList.add("is-save-easter-shaking");
-						els.selectionStatus.textContent = "继续按住可导出 CSV";
+						els.selectionStatus.textContent = "Keep holding to export CSV";
 					}, SAVE_EASTER_SHAKE_DELAY_MS);
 
 					hold.exportTimer = window.setTimeout(() => {
@@ -3577,31 +3577,31 @@
 				function exportOptimizeResultsCsv() {
 					const rows = getSortedResults().map(({ item }) => item);
 					if (!rows.length) {
-						els.selectionStatus.textContent = "暂无可导出的结果";
+						els.selectionStatus.textContent = "No results to export";
 						return false;
 					}
 
-					const header = ["优选IP", "IP类型", "优选类型", "国家/地区", "数据中心", "延迟(ms)", "速度(Mbps)"];
+					const header = ["Preferred IP", "IP Type", "Preferred Type", "Country/Region", "Data Center", "Latency (ms)", "Speed (Mbps)"];
 					const csvRows = rows.map((item) => [
 						item.address || "",
-						item.ipType || "未知",
+						item.ipType || "Unknown",
 						item.type || "",
-						item.country || "未知",
-						item.colo || "未知",
+						item.country || "Unknown",
+						item.colo || "Unknown",
 						Number.isFinite(item.latency) ? item.latency : "",
 						formatSpeedForCsv(item)
 					]);
 					const csv = [header, ...csvRows].map(formatCsvRow).join("\r\n");
 					downloadTextFile(`bestcf-results-${timestampForFilename()}.csv`, `\uFEFF${csv}`, "text/csv;charset=utf-8");
-					els.selectionStatus.textContent = `已导出 ${rows.length} 个`;
+					els.selectionStatus.textContent = `Exported ${rows.length}`;
 					return true;
 				}
 
 				function formatSpeedForCsv(item) {
 					if (item.speedState === "done") return `${formatSpeedMbps(item.speedMbps)}`;
-					if (item.speedState === "testing") return "测速中";
-					if (item.speedState === "failed") return "失败";
-					if (item.speedState === "stopped") return "测速已停止";
+					if (item.speedState === "testing") return "Speed testing";
+					if (item.speedState === "failed") return "Failed";
+					if (item.speedState === "stopped") return "Speed test stopped";
 					return "";
 				}
 
@@ -3671,9 +3671,9 @@
 				async function copySelectedResults(lines) {
 					try {
 						await writeClipboardText(lines.join("\n"));
-						els.selectionStatus.textContent = `已复制 ${lines.length} 个`;
+						els.selectionStatus.textContent = `Copied ${lines.length}`;
 					} catch (error) {
-						els.selectionStatus.textContent = "保存失败";
+						els.selectionStatus.textContent = "Save failed";
 					}
 				}
 
@@ -3681,9 +3681,9 @@
 					if (!address) return;
 					try {
 						await writeClipboardText(address);
-						showCopyAddressTip(anchor, "已复制到粘贴板");
+						showCopyAddressTip(anchor, "Copied to clipboard");
 					} catch (error) {
-						showCopyAddressTip(anchor, "复制失败");
+						showCopyAddressTip(anchor, "Copy failed");
 					}
 				}
 
@@ -3783,8 +3783,8 @@
 						label.classList.toggle("is-filtered", isResultFilterActive(key));
 						label.classList.toggle("is-active", state.openResultFilterKey === key);
 						label.title = isResultFilterActive(key)
-							? `${RESULT_FILTER_LABELS[key] || "字段"} 已筛选`
-							: `筛选 ${RESULT_FILTER_LABELS[key] || "字段"}`;
+							? `${RESULT_FILTER_LABELS[key] || "Field"} filtered`
+							: `Filter ${RESULT_FILTER_LABELS[key] || "Field"}`;
 					});
 				}
 
@@ -3809,8 +3809,8 @@
 					menu.dataset.filterMenuKey = key;
 					menu.innerHTML = `
 						<div class="result-filter-actions">
-							<button class="result-filter-action" type="button" data-filter-action="all">全选</button>
-							<button class="result-filter-action" type="button" data-filter-action="invert">反选</button>
+							<button class="result-filter-action" type="button" data-filter-action="all">Select all</button>
+							<button class="result-filter-action" type="button" data-filter-action="invert">Invert</button>
 						</div>
 						<div class="result-filter-options">
 							${options.map((option) => {
@@ -3820,7 +3820,7 @@
 									${renderResultFilterOptionText(key, option.value)}
 									<span class="result-filter-option-count">(${option.count})</span>
 								</label>`;
-					}).join("") || '<div class="empty">暂无可筛选内容</div>'}
+					}).join("") || '<div class="empty">No filterable content</div>'}
 						</div>`;
 					document.body.appendChild(menu);
 					positionResultFilterMenu(menu, anchor);
@@ -3936,11 +3936,11 @@
 				}
 
 				function resultFilterValue(item, key) {
-					if (key === "ipType") return String(item.ipType || "未知");
-					if (key === "type") return String(item.type || "未知");
-					if (key === "country") return String(item.country || "未知");
-					if (key === "colo") return String(item.colo || "未知");
-					return String(item[key] || "未知");
+					if (key === "ipType") return String(item.ipType || "Unknown");
+					if (key === "type") return String(item.type || "Unknown");
+					if (key === "country") return String(item.country || "Unknown");
+					if (key === "colo") return String(item.colo || "Unknown");
+					return String(item[key] || "Unknown");
 				}
 
 				function getVisibleSortedResults() {
@@ -3998,14 +3998,14 @@
 					if (item.speedState === "pending") {
 						const pendingTargets = state.speedRun && state.speedRun.batchTargets;
 						if (!pendingTargets || !pendingTargets.has(index)) {
-							return `<button class="link-btn speed-test-btn${isBatchTarget ? " is-speed-batch-target" : ""}" type="button" data-speed-index="${index}" title="点击开始测速" aria-label="点击开始测速">${svgRunIcon()}<span>测速</span></button>`;
+							return `<button class="link-btn speed-test-btn${isBatchTarget ? " is-speed-batch-target" : ""}" type="button" data-speed-index="${index}" title="Click to start speed test" aria-label="Click to start speed test">${svgRunIcon()}<span>Speed Test</span></button>`;
 						}
-						return `<button class="link-btn speed-test-btn is-speed-pending" type="button" data-speed-index="${index}" disabled aria-disabled="true" title="等待测速中" aria-label="等待测速中">${svgRunIcon()}<span>测速中</span></button>`;
+						return `<button class="link-btn speed-test-btn is-speed-pending" type="button" data-speed-index="${index}" disabled aria-disabled="true" title="Waiting for speed test" aria-label="Waiting for speed test">${svgRunIcon()}<span>Testing</span></button>`;
 					}
 					if (item.speedState === "done") return `<button class="link-btn speed-test-btn${isBatchTarget ? " is-speed-batch-target" : ""}" type="button" data-speed-index="${index}"><strong>${formatSpeedMbps(item.speedMbps)}Mbps</strong></button>`;
-					if (item.speedState === "failed") return `<button class="tag bad speed-retry-tag speed-test-btn${isBatchTarget ? " is-speed-batch-target" : ""}" type="button" data-speed-index="${index}" title="点击重试测速" aria-label="测速失败，点击重试">失败</button>`;
-					if (item.speedState === "stopped") return '<span class="muted">测速已停止</span>';
-					return `<button class="link-btn speed-test-btn${isBatchTarget ? " is-speed-batch-target" : ""}" type="button" data-speed-index="${index}" title="点击开始测速" aria-label="点击开始测速">${svgRunIcon()}<span>测速</span></button>`;
+					if (item.speedState === "failed") return `<button class="tag bad speed-retry-tag speed-test-btn${isBatchTarget ? " is-speed-batch-target" : ""}" type="button" data-speed-index="${index}" title="Click to retry speed test" aria-label="Speed test failed, click to retry">Failed</button>`;
+					if (item.speedState === "stopped") return '<span class="muted">Speed test stopped</span>';
+					return `<button class="link-btn speed-test-btn${isBatchTarget ? " is-speed-batch-target" : ""}" type="button" data-speed-index="${index}" title="Click to start speed test" aria-label="Click to start speed test">${svgRunIcon()}<span>Speed Test</span></button>`;
 				}
 
 				function formatSpeedMbps(speedMbps) {
@@ -4014,7 +4014,7 @@
 				}
 
 				function renderCountryCell(country) {
-					const text = String(country || "未知").trim() || "未知";
+					const text = String(country || "Unknown").trim() || "Unknown";
 					const countryCode = /^[a-zA-Z]{2}$/.test(text) ? text.toLowerCase() : "";
 					const flag = countryCode
 						? `<img class="country-flag" src="https://ipdata.co/flags/${countryCode}.png" alt="" loading="lazy" onerror="this.remove()">`
@@ -4048,7 +4048,7 @@
 						if (normalized) fixed.push(normalized);
 					}
 
-					// 随机打乱固定IP、CIDR和范围列表，以确保每次选取的候选IP是随机且不同的
+					// Randomly shuffle the fixed IP, CIDR, and range lists so the candidates picked each time are random and different
 					for (let i = fixed.length - 1; i > 0; i--) {
 						const j = Math.floor(Math.random() * (i + 1));
 						[fixed[i], fixed[j]] = [fixed[j], fixed[i]];
@@ -4397,7 +4397,7 @@
 
 				async function fetchJsonFromFastestEndpoint(endpoints, path, timeout) {
 					const bases = Array.from(new Set((Array.isArray(endpoints) ? endpoints : [endpoints]).filter(Boolean)));
-					if (!bases.length) throw new Error("无可用检测地址");
+					if (!bases.length) throw new Error("No available detection addresses");
 
 					const run = { stopped: false, controllers: new Set() };
 					let pending = bases.length;
@@ -4416,7 +4416,7 @@
 									if (run.stopped) return;
 									lastError = error;
 									pending -= 1;
-									if (pending === 0) reject(lastError || new Error("检测失败"));
+									if (pending === 0) reject(lastError || new Error("Detection failed"));
 								});
 						});
 					});
@@ -4449,7 +4449,7 @@
 
 					try {
 						if (typeof window.parent.fetchWithAutoMirror !== "function") return null;
-						return await window.parent.fetchWithAutoMirror(url, "BestCF IP库");
+						return await window.parent.fetchWithAutoMirror(url, "BestCF IP Library");
 					} catch (error) {
 						return null;
 					}
@@ -4488,9 +4488,9 @@
 				}
 
 				function friendlyError(error) {
-					if (!error) return "操作失败";
-					if (error.name === "AbortError") return "请求超时或已停止";
-					return error.message || "操作失败";
+					if (!error) return "Operation failed";
+					if (error.name === "AbortError") return "Request timed out or was stopped";
+					return error.message || "Operation failed";
 				}
 			</script>
 		</body>
