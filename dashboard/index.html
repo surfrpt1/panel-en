@@ -189,7 +189,11 @@
       </div>
       <div class="field-row">
         <label>Transport</label>
-        <div class="field-control"><select id="transportSelect"></select></div>
+        <div class="field-control"><select id="transportSelect" onchange="onTransportChange()">
+          <option value="ws">WebSocket (ws)</option>
+          <option value="grpc">gRPC (grpc)</option>
+          <option value="xhttp">XHTTP (xhttp)</option>
+        </select></div>
       </div>
       <div class="field-row" id="grpcModeRow">
         <label>gRPC mode</label>
@@ -223,6 +227,11 @@
             <option value="chrome">chrome</option>
             <option value="firefox">firefox</option>
             <option value="safari">safari</option>
+            <option value="ios">ios</option>
+            <option value="android">android</option>
+            <option value="edge">edge</option>
+            <option value="360">360</option>
+            <option value="qq">qq</option>
             <option value="random">random</option>
             <option value="none">none</option>
           </select>

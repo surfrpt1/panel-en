@@ -731,7 +731,7 @@ function syncTransportSettingsFromConfig() {
   }
   transportRow.style.display = '';
   $('transportSelect').value = currentConfig['传输协议'] || 'ws';
-  if (!['ws', 'grpc', 'httpupgrade', 'xhttp'].includes($('transportSelect').value)) {
+  if (!['ws', 'grpc', 'xhttp'].includes($('transportSelect').value)) {
     $('transportSelect').value = 'ws';
   }
   $('grpcModeSelect').value = currentConfig['gRPC模式'] || 'gun';
@@ -751,6 +751,11 @@ function updateGrpcModeVisibility() {
   if (grpcUaRow && currentConfig['gRPCUserAgent'] !== undefined) {
     grpcUaRow.style.display = isGrpc ? '' : 'none';
   }
+}
+
+function onTransportChange() {
+  updateGrpcModeVisibility();
+  markModified('config');
 }
 
 let pendingSSTLS = null;
