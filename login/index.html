@@ -767,17 +767,19 @@
 	</div>
 
 	<script>
+		// ====== 一次性会话令牌校验 ======
+		// 每次登录成功后 mint 一个令牌到 sessionStorage，跳转 /dashboard 时被消费。
+		// 没有令牌（直接打开 /dashboard 或 /login）一律要求输入密码，
+		// 保证每次打开任意链接都需要重新登录。
+		// 注意：AUTHD_KEY 必须定义在顶层，DOMContentLoaded 和 submit 两个回调都会用到。
+		const AUTHD_KEY = '_surfrpt_authed';
+
 		document.addEventListener('DOMContentLoaded', async () => {
 			const passwordInput = document.getElementById('password');
 			const loginBtn = document.getElementById('loginBtn');
 			const irModal = document.getElementById('ir-modal');
 			const redirectUrl = 'https://github.com/bia-pain-bache/BPB-Worker-Panel';
 
-			// ====== 一次性会话令牌校验 ======
-			// 每次登录成功后 mint 一个令牌到 sessionStorage，跳转 /dashboard 时被消费。
-			// 没有令牌（直接打开 /dashboard 或 /login）一律要求输入密码，
-			// 保证每次打开任意链接都需要重新登录。
-			const AUTHD_KEY = '_surfrpt_authed';
 			try {
 				if (sessionStorage.getItem(AUTHD_KEY) === '1') {
 					window.location.replace('/dashboard/');
