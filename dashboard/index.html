@@ -106,6 +106,25 @@
     </div>
   </section>
 
+  <section class="module" id="m-import">
+    <div class="module-title" onclick="toggleModule('m-import')">
+      <span class="collapse-icon">▸</span>
+      <span class="module-name">🔗 Import Dashboards</span>
+    </div>
+    <div class="module-content">
+      <div class="field-row">
+        <label>Dashboard URL</label>
+        <div class="field-control">
+          <input type="text" id="importLinkInput" placeholder="https://vless-ws.surfrpt.workers.dev/dashboard/" onkeydown="if(event.key==='Enter')addImportLink()">
+          <button type="button" onclick="addImportLink()">➕ Add</button>
+          <button type="button" onclick="saveImportLinks()">💾 Save</button>
+        </div>
+      </div>
+      <div class="hint">Paste a dashboard URL, then click Add. Clicking a saved link opens that dashboard's login page. Links are shared across all workers.</div>
+      <div id="savedDashboardsList" class="saved-dashboards-list"></div>
+    </div>
+  </section>
+
   <section class="module" id="m-subgen">
     <div class="module-title non-collapsible" onclick="event.stopPropagation()">
       <span class="collapse-icon">▾</span>

@@ -559,6 +559,109 @@ function updateCountdown(forceUpdate = false) {
   el.textContent = `Reset in ${hours}:${minutes}:${seconds} (UTC)`;
 }
 
+/* ---------- Import Dashboards (shared links) ---------- */
+let savedDashboards = [];
+
+async function loadImportLinks() {
+  try {
+    const response = await fetch('/admin/links.json?_t=' + Date.now(), {
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
+    });
+    const contentType = response.headers.get('content-type') || '';
+    if (!response.ok || contentType.includes('text/html')) {
+      showToast('Failed to load saved dashboards', 'error');
+      return;
+    }
+    const data = await response.json();
+    savedDashboards = Array.isArray(data) ? data.filter(d => d && d.url) : [];
+    renderSavedDashboards();
+  } catch (error) {
+    showToast('Failed to load saved dashboards: ' + error.message, 'error');
+  }
+}
+
+function renderSavedDashboards() {
+  const list = $('savedDashboardsList');
+  if (!list) return;
+  if (savedDashboards.length === 0) {
+    list.innerHTML = '<div class="saved-dashboard-empty">No dashboards saved yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  savedDashboards.forEach((item, index) => {
+    const name = item.name || friendlyDashboardName(item.url);
+    const row = document.createElement('div');
+    row.className = 'saved-dashboard-item';
+    row.innerHTML =
+      '<span class="db-name">' + escapeHtml(name) + '</span>' +
+      '<span class="db-url">' + escapeHtml(item.url) + '</span>' +
+      '<span class="db-actions">' +
+      '  <button type="button" onclick="openSavedDashboard(' + index + ')">🔗 Open</button>' +
+      '  <button type="button" onclick="removeSavedDashboard(' + index + ')">🗑</button>' +
+      '</span>';
+    list.appendChild(row);
+  });
+}
+
+function friendlyDashboardName(url) {
+  try {
+    const u = new URL(url);
+    const host = u.hostname;
+    const port = u.port ? ':' + u.port : '';
+    return host + port;
+  } catch (e) {
+    return url;
+  }
+}
+
+function openSavedDashboard(index) {
+  const item = savedDashboards[index];
+  if (!item || !item.url) return;
+  window.location.href = item.url;
+}
+
+function addImportLink() {
+  const input = $('importLinkInput');
+  if (!input) return;
+  const raw = input.value.trim();
+  if (!raw) { showToast('Paste a dashboard URL first', 'error'); return; }
+  let url = raw;
+  try {
+    const parsed = new URL(raw);
+    if (!parsed.pathname || parsed.pathname === '/' || parsed.pathname === '') url = parsed.origin + '/dashboard/';
+  } catch (e) {
+    showToast('Invalid URL: ' + raw, 'error');
+    return;
+  }
+  if (savedDashboards.some(d => d.url === url)) { showToast('This dashboard is already saved', 'info'); return; }
+  savedDashboards.push({ name: friendlyDashboardName(url), url, addedAt: Date.now() });
+  input.value = '';
+  renderSavedDashboards();
+  showToast('Dashboard added. Click Save to persist across all workers.', 'info');
+}
+
+function removeSavedDashboard(index) {
+  savedDashboards.splice(index, 1);
+  renderSavedDashboards();
+}
+
+async function saveImportLinks() {
+  try {
+    const response = await fetch('/admin/links.json', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      body: JSON.stringify({ links: savedDashboards })
+    });
+    if (!response.ok) throw new Error('save failed');
+    const result = await response.json();
+    savedDashboards = Array.isArray(result.links) ? result.links : savedDashboards;
+    renderSavedDashboards();
+    showToast('✅ Saved dashboards shared across all workers', 'success');
+  } catch (error) {
+    showToast('😢 ' + error.message + ' — could not save dashboards.', 'error');
+  }
+}
+
 /* ---------- Copy & QR ---------- */
 function copyField(id) {
   const el = $(id);
@@ -3854,5 +3957,6 @@ updateCountdown();
 
 document.addEventListener('DOMContentLoaded', () => {
   loadConfig();
+  loadImportLinks();
   scheduleNetworkInfoLoad();
 });
