@@ -3956,7 +3956,17 @@ setInterval(updateCountdown, 1000);
 updateCountdown();
 
 document.addEventListener('DOMContentLoaded', () => {
-  loadConfig();
-  loadImportLinks();
-  scheduleNetworkInfoLoad();
+  // 每次打开 dashboard 都要求重新登录：登录成功后 mint 的令牌只使用一次。
+  // 没有令牌（重新打开任意链接）→ 清除 auth cookie 并跳转 /login。
+  const AUTHD_KEY = '_surfrpt_authed';
+  let hasAuthToken = false;
+  try { hasAuthToken = sessionStorage.getItem(AUTHD_KEY) === '1'; } catch (_) {}
+  if (hasAuthToken) {
+    try { sessionStorage.removeItem(AUTHD_KEY); } catch (_) {}
+    loadConfig();
+    loadImportLinks();
+    scheduleNetworkInfoLoad();
+  } else {
+    window.location.href = '/logout';
+  }
 });

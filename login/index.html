@@ -773,42 +773,18 @@
 			const irModal = document.getElementById('ir-modal');
 			const redirectUrl = 'https://github.com/bia-pain-bache/BPB-Worker-Panel';
 
-			// ====== 客户端鉴权检查（带防循环重定向保护）======
-			// Worker 服务端 302 重定向在某些场景下不可靠（浏览器缓存、
-			// SameSite=Strict 时序、UA 头差异等），需要客户端侧二次兜底。
-			// 但如果 /admin 的鉴权检查持续失败（根因在 Worker 侧），
-			// 无条件重定向会造成 /login → /admin → /login 死循环。
-			// 因此用 sessionStorage 计数器限制自动重定向最多 1 次。
-			const REDIRECT_KEY = '_auth_auto_redirect';
-			const autoRedirectCount = parseInt(sessionStorage.getItem(REDIRECT_KEY) || '0', 10);
-			const allowAutoRedirect = autoRedirectCount < 1;
-
-			if (allowAutoRedirect) {
-				try {
-					const authCheckController = new AbortController();
-					const authTimeoutId = setTimeout(() => authCheckController.abort(), 5000);
-
-					const authResponse = await fetch('/admin/config.json?_t=' + Date.now(), {
-						method: 'HEAD',
-						redirect: 'manual',
-						signal: authCheckController.signal,
-						cache: 'no-store'
-					});
-					clearTimeout(authTimeoutId);
-
-					// 200 = Worker 端鉴权通过（cookie 有效），跳转 /admin
-					if (authResponse.ok) {
-						sessionStorage.setItem(REDIRECT_KEY, '1');
-						window.location.replace('/dashboard/');
-						return;
-					}
-				} catch (_) {
-					// 超时或网络失败，安全兜底：继续展示登录页
+			// ====== 一次性会话令牌校验 ======
+			// 每次登录成功后 mint 一个令牌到 sessionStorage，跳转 /dashboard 时被消费。
+			// 没有令牌（直接打开 /dashboard 或 /login）一律要求输入密码，
+			// 保证每次打开任意链接都需要重新登录。
+			const AUTHD_KEY = '_surfrpt_authed';
+			try {
+				if (sessionStorage.getItem(AUTHD_KEY) === '1') {
+					window.location.replace('/dashboard/');
+					return;
 				}
-			} else {
-				// 已达到自动重定向上限，清除计数器，允许用户手动登录
-				sessionStorage.removeItem(REDIRECT_KEY);
-			}
+				sessionStorage.removeItem(AUTHD_KEY);
+			} catch (_) {}
 
 			// Function to enable login
 			const enableLogin = () => {
@@ -973,7 +949,8 @@
 				// fetch 默认会自动跟随 302 → GET /admin → 返回 HTML → 前端误判为"密码错误"。
 				// 使用 redirect: 'manual' 拦截 302，直接跳转 /admin。
 				if (response.type === 'opaqueredirect') {
-					// Worker 返回了重定向 = auth cookie 仍然有效，直接进 /admin
+					// Worker 返回了重定向 = auth cookie 仍然有效，直接进 /dashboard
+					try { sessionStorage.setItem(AUTHD_KEY, '1'); } catch (_) {}
 					window.location.replace('/dashboard/');
 					return;
 				}
@@ -986,6 +963,7 @@
 						const data = await response.json();
 						if (data.success) {
 							// 登录成功，使用 replace 避免留下 /login 在浏览器历史中
+							try { sessionStorage.setItem(AUTHD_KEY, '1'); } catch (_) {}
 							window.location.replace('/dashboard/');
 						}
 					} else {
