@@ -124,6 +124,20 @@ input[readonly] { color: var(--text-dim); }
 .status-loading { background: var(--warning); }
 .status-success { background: var(--success); }
 .status-error { background: var(--danger); }
+.network-card-title { display: flex; align-items: center; gap: 8px; }
+.title-text { display: flex; flex-direction: column; min-width: 0; }
+.title-main { font-weight: 600; font-size: 14px; }
+.title-subtitle { font-size: 12px; color: var(--text-dim); }
+.network-info-content { margin-top: 8px; }
+.location-text { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+.network-tip { font-size: 12px; color: var(--text-dim); margin-top: 6px; }
+.network-actions { margin-top: 12px; }
+.tw-subtitle-google { color: #4285F4; }
+.tw-subtitle-twitter { color: #1DA1F2; }
+.cf-subtitle-v4 { color: var(--info); }
+.cf-subtitle-v6 { color: var(--teal); }
+.cf-subtitle-sep { color: var(--text-dim); }
+.cf-subtitle-switch { cursor: pointer; text-decoration: underline dotted; }
 
 /* Latency */
 .latency-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }
@@ -135,6 +149,20 @@ input[readonly] { color: var(--text-dim); }
 .latency-card .lc-value { font-family: var(--mono); font-size: 18px; font-weight: 700; margin-top: 4px; }
 .latency-card .lc-value .unit { font-size: 12px; font-weight: 400; color: var(--text-dim); }
 .latency-card svg { width: 100%; height: 44px; margin-top: 6px; display: block; }
+.latency-ecg { width: 100%; height: 44px; margin-top: 6px; display: block; }
+.latency-card-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.latency-card-info { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.latency-card-icon-wrapper { width: 30px; height: 30px; border-radius: 7px; flex: none; display: flex; align-items: center; justify-content: center; overflow: hidden; background: var(--bg-elevated); }
+.latency-card-icon-wrapper svg { width: 26px; height: 26px; margin: 0; display: block; }
+.latency-card-text { display: flex; flex-direction: column; min-width: 0; }
+.latency-card-name { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.latency-card-region { font-size: 11px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 999px; padding: 0 8px; width: fit-content; }
+.latency-status { font-family: var(--mono); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.latency-status .unit { font-size: 11px; font-weight: 400; color: var(--text-dim); }
+.latency-fast { color: var(--latency-49); }
+.latency-good { color: var(--latency-149); }
+.latency-slow { color: var(--latency-299); }
+.latency-timeout { color: var(--latency-999); }
 
 /* Logs */
 .logs-list { display: flex; flex-direction: column; gap: 8px; }

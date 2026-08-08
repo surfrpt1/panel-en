@@ -59,6 +59,8 @@ let cloudFlareEntries = [];
 let cloudFlareActiveIndex = 0;
 let twitterEntries = [];
 let twitterActiveIndex = 0;
+let indiaEntries = [];
+let indiaActiveIndex = 0;
 
 /* Latency state */
 const latencySiteLatencies = {};
@@ -2924,16 +2926,16 @@ function renderNetworkCards() {
   container.innerHTML = `
     <div class="network-card">
       <div class="network-card-title">
-        <span class="status-indicator" id="status-ipip"></span>
+        <span class="status-indicator" id="status-india"></span>
         <div class="title-text">
-          <div class="title-main">🇨🇳 CN Test</div>
-          <div class="title-subtitle">CN-Test</div>
+          <div class="title-main">🇮🇳 India Test</div>
+          <div class="title-subtitle">Most used in India</div>
         </div>
       </div>
       <div class="network-info-content">
-        <span id="ipip-ip" class="ip-text">-</span>
-        <div class="location-text"><span id="ipip-country" class="country-text">-</span></div>
-        <div class="network-tip">· The IP you use to visit domestic sites</div>
+        <span id="india-ip" class="ip-text">-</span>
+        <div class="location-text"><span id="india-country" class="country-text">-</span></div>
+        <div id="india-tip" class="network-tip">· The IP you use to visit popular sites in India</div>
       </div>
     </div>
     <div class="network-card">
@@ -2941,7 +2943,7 @@ function renderNetworkCards() {
         <span class="status-indicator" id="status-overseas"></span>
         <div class="title-text">
           <div class="title-main">🌍 Overseas Test</div>
-          <div class="title-subtitle">漏网之鱼</div>
+          <div class="title-subtitle">Unblocked Overseas</div>
         </div>
       </div>
       <div class="network-info-content">
@@ -2969,7 +2971,7 @@ function renderNetworkCards() {
         <span class="status-indicator" id="status-twitter"></span>
         <div class="title-text">
           <div class="title-main">🚀 Outside Test</div>
-          <div class="title-subtitle">!CN-Test</div>
+          <div class="title-subtitle">Google · X.com</div>
         </div>
       </div>
       <div class="network-info-content">
@@ -2983,50 +2985,117 @@ function renderNetworkCards() {
     </div>`;
 }
 
-async function fetchIpipData() {
-  setStatus('status-ipip', 'loading');
-  const statusElement = $('status-ipip');
+async function fetchIndiaTestData() {
+  setStatus('status-india', 'loading');
+  const statusElement = $('status-india');
   const titleElement = statusElement ? statusElement.parentElement : null;
-  const testSources = [
-    { type: 'head', name: 'ByteDance', url: 'https://perfops2.byte-test.com/500b-bench.jpg', ipHeader: 'X-Request-Ip' },
-    { type: 'head', name: 'ByteDance', url: 'https://perfops.byte-test.com', ipHeader: 'X-Request-Ip' },
-    { type: 'head', name: 'NetEase', url: 'https://necaptcha.nosdn.127.net/ab7f4275c1744aa28e0a8f3a1c58c532.png', ipHeader: 'cdn-user-ip' },
-    { type: 'jsonp', name: 'Tencent', url: 'https://r.inews.qq.com/api/ip2city?otype=jsonp', callbackParam: 'callback', extractIp: payload => payload?.ip },
-    { type: 'jsonp', name: 'PConline', url: 'https://whois.pconline.com.cn/ipJson.jsp', callbackParam: 'callback', extractIp: payload => payload?.ip },
-    { type: 'jsonp', name: 'Alibaba', url: `https://${Date.now()}.dns-detect.alicdn.com/api/detect/DescribeDNSLookup`, callbackParam: 'cb', extractIp: payload => payload?.content?.localIp }
-  ];
-  const headSources = testSources.filter(s => s.type === 'head');
-  const jsonpSources = testSources.filter(s => s.type === 'jsonp');
-  let fastestSuccess;
-  try {
-    try {
-      fastestSuccess = await raceIpProbeSources(headSources, 'CN HEAD');
-    } catch (headError) {
-      fastestSuccess = await raceIpProbeSources(jsonpSources, 'CN JSONP');
-    }
-  } catch (error) {
-    setNetworkFieldError('ipip-ip', 'load failed');
-    clearNetworkFieldValue('ipip-country');
-    setStatus('status-ipip', 'error');
-    return;
-  }
+  const tipElement = $('india-tip');
+  const isInvalid = ip => {
+    const candidate = String(ip || '').trim();
+    return !candidate || candidate === '0.0.0.0';
+  };
 
-  setNetworkFieldValue('ipip-ip', fastestSuccess.requestIp, 'ip');
-  clearNetworkFieldValue('ipip-country');
-  if (titleElement) {
-    titleElement.innerHTML = `<span class="status-indicator" id="status-ipip"></span><div class="title-text"><div class="title-main">🇨🇳 CN Test</div><div class="title-subtitle">${fastestSuccess.providerName}</div></div>`;
-    setStatus('status-ipip', 'loading');
-  }
+  const sources = [
+    {
+      name: 'Google',
+      createTask: () => {
+        const jsonpTask = createJsonpRequest(`https://jsonp-ip.appspot.com/?_t=${Date.now()}`, 'callback');
+        return {
+          cancel: jsonpTask.cancel,
+          promise: jsonpTask.promise.then(payload => {
+            const requestIp = String(payload?.ip || '').trim();
+            if (isInvalid(requestIp)) throw new Error('google jsonp invalid ip');
+            return { providerName: 'Google', requestIp };
+          })
+        };
+      }
+    },
+    {
+      name: 'X.com',
+      createTask: () => {
+        const controller = new AbortController();
+        return {
+          cancel: () => controller.abort(),
+          promise: (async () => {
+            const response = await fetchWithTimeout(`https://help.x.com/cdn-cgi/trace?_t=${Date.now()}`, {
+              cache: 'no-store', signal: controller.signal
+            });
+            if (!response.ok) throw new Error(`x trace HTTP ${response.status}`);
+            const text = await response.text();
+            const ipLine = text.split('\n').find(line => line.startsWith('ip='));
+            const requestIp = String(ipLine ? ipLine.slice(3) : '').trim();
+            if (isInvalid(requestIp)) throw new Error('x trace invalid ip');
+            return { providerName: 'X.com', requestIp };
+          })()
+        };
+      }
+    },
+    {
+      name: 'GitHub',
+      createTask: () => {
+        const controller = new AbortController();
+        return {
+          cancel: () => controller.abort(),
+          promise: (async () => {
+            const response = await fetchWithTimeout(`https://github.com/cdn-cgi/trace?_t=${Date.now()}`, {
+              cache: 'no-store', signal: controller.signal
+            });
+            if (!response.ok) throw new Error(`github trace HTTP ${response.status}`);
+            const text = await response.text();
+            const ipLine = text.split('\n').find(line => line.startsWith('ip='));
+            const requestIp = String(ipLine ? ipLine.slice(3) : '').trim();
+            if (isInvalid(requestIp)) throw new Error('github trace invalid ip');
+            return { providerName: 'GitHub', requestIp };
+          })()
+        };
+      }
+    }
+  ];
+
+  indiaEntries = [];
+  indiaActiveIndex = 0;
+
   try {
-    const info = await fetchIpInfoByIp(fastestSuccess.requestIp);
-    const ip = String(info.ip || fastestSuccess.requestIp || 'unknown').trim();
-    const location = formatIpInfoLocation(info);
-    setNetworkFieldValue('ipip-ip', ip, 'ip');
-    setNetworkFieldValue('ipip-country', location, 'location');
-    setStatus('status-ipip', 'success');
-  } catch (detailError) {
-    setNetworkFieldValue('ipip-country', 'unknown', 'location');
-    setStatus('status-ipip', 'success');
+    const settled = await Promise.allSettled(sources.map(async source => {
+      const task = source.createTask();
+      return { source: source.name, result: await task.promise };
+    }));
+    const successful = settled
+      .filter(item => item.status === 'fulfilled' && item.value && item.value.result)
+      .map(item => item.value);
+    if (!successful.length) throw new Error('all india sources failed');
+
+    const detailPromises = successful.map(async ({ source, result }) => {
+      try {
+        const info = await fetchIpInfoByIp(result.requestIp);
+        return {
+          providerName: result.providerName,
+          ip: String(info.ip || result.requestIp || 'unknown').trim(),
+          loc: formatIpInfoLocation(info)
+        };
+      } catch (e) {
+        return {
+          providerName: result.providerName,
+          ip: String(result.requestIp || 'unknown').trim(),
+          loc: 'unknown'
+        };
+      }
+    });
+    indiaEntries = await Promise.all(detailPromises);
+    indiaActiveIndex = 0;
+    const activeEntry = indiaEntries[0];
+    setNetworkFieldValue('india-ip', activeEntry.ip, 'ip');
+    setNetworkFieldValue('india-country', activeEntry.loc || 'unknown', 'location');
+    if (tipElement) tipElement.textContent = `· The IP you use to visit ${activeEntry.providerName} in India`;
+    if (titleElement) {
+      const providers = indiaEntries.map(entry => entry.providerName).join(' · ');
+      titleElement.innerHTML = `<span class="status-indicator" id="status-india"></span><div class="title-text"><div class="title-main">🇮🇳 India Test</div><div class="title-subtitle">${providers}</div></div>`;
+    }
+    setStatus('status-india', 'success');
+  } catch (error) {
+    setNetworkFieldError('india-ip', 'load failed');
+    clearNetworkFieldValue('india-country');
+    setStatus('status-india', 'error');
   }
 }
 
@@ -3220,7 +3289,7 @@ async function fetchTwitterData() {
       return '';
     };
     if (!twitterEntries.length) {
-      titleElement.innerHTML = '<span class="status-indicator" id="status-twitter"></span><div class="title-text"><div class="title-main">🚀 Outside Test</div><div class="title-subtitle">!CN-Test</div></div>';
+      titleElement.innerHTML = '<span class="status-indicator" id="status-twitter"></span><div class="title-text"><div class="title-main">🚀 Outside Test</div><div class="title-subtitle">Google · X.com</div></div>';
       if (prevStatus) setStatus('status-twitter', prevStatus);
       return;
     }
@@ -3408,7 +3477,7 @@ async function loadNetworkInfo() {
   const tasks = [
     { name: 'Overseas Test', run: fetchOverseasTestData },
     { name: 'CloudFlare', run: fetchCloudFlareData },
-    { name: 'CN Test', run: fetchIpipData },
+    { name: 'India Test', run: fetchIndiaTestData },
     { name: 'Outside Test', run: fetchTwitterData }
   ];
   networkInfoLoadPromise = (async () => {
@@ -3422,28 +3491,40 @@ async function loadNetworkInfo() {
 /* ---------- Latency cards ---------- */
 const latencySites = [
   {
-    name: 'ByteDance',
-    region: 'CN',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#1677FF" d="m19.9 1.5 4.1 1v19l-4.1 1zM6.5 10.9l4.1 1v9l-4 1.1zM0 2.6l4.1 1v16.8l-4.1 1zm17.5 5.6v11.1l-4.2-1v-9z"></path></svg>',
-    url: 'https://lf3-zlink-tos.ugurl.cn/obj/zebra-public/resource_lmmizj_1632398893.png'
+    name: 'Google',
+    region: 'India',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#4285F4"/><text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">G</text></svg>',
+    url: 'https://www.google.co.in/favicon.ico'
   },
   {
-    name: 'Bilibili',
-    region: 'CN',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#FB7299" d="M17.813 4.653h.854q2.266.08 3.773 1.574Q23.946 7.72 24 9.987v7.36q-.054 2.266-1.56 3.773c-1.506 1.507-2.262 1.524-3.773 1.56H5.333q-2.266-.054-3.773-1.56C.053 19.614.036 18.858 0 17.347v-7.36q.054-2.267 1.56-3.76t3.773-1.574h.774l-1.174-1.12a1.23 1.23 0 0 1-.373-.906q0-.534.373-.907l.027-.027q.4-.373.92-.373t.92.373L9.653 4.44q.107.106.187.213h4.267a.8.8 0 0 1 .16-.213l2.853-2.747q.4-.373.92-.373c.347 0 .662.151.929.4s.391.551.391.907q0 .532-.373.906zM5.333 7.24q-1.12.027-1.88.773q-.76.748-.786 1.894v7.52q.026 1.146.786 1.893t1.88.773h13.334q1.12-.026 1.88-.773t.786-1.893v-7.52q-.026-1.147-.786-1.894t-1.88-.773zM8 11.107q.56 0 .933.373q.375.374.4.96v1.173q-.025.586-.4.96q-.373.375-.933.374c-.56-.001-.684-.125-.933-.374q-.375-.373-.4-.96V12.44q0-.56.386-.947q.387-.386.947-.386m8 0q.56 0 .933.373q.375.374.4.96v1.173q-.025.586-.4.96q-.373.375-.933.374c-.56-.001-.684-.125-.933-.374q-.375-.373-.4-.96V12.44q.025-.586.4-.96q.373-.373.933-.373"></path></svg>',
-    url: 'https://i0.hdslb.com/bfs/face/member/noface.jpg@24w_24h_1c'
+    name: 'WhatsApp',
+    region: 'India',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#25D366"/><text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">W</text></svg>',
+    url: 'https://web.whatsapp.com/favicon.ico'
   },
   {
-    name: 'WeChat',
-    region: 'CN',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#09B83E" d="M8.7 2.19C3.9 2.19 0 5.48 0 9.53c0 2.21 1.17 4.2 3 5.55a.6.6 0 0 1 .21.66l-.39 1.48q-.03.11-.04.22c0 .16.13.3.29.3a.3.3 0 0 0 .16-.06l1.9-1.11a.9.9 0 0 1 .72-.1 10 10 0 0 0 2.84.4q.41-.01.81-.05a5.85 5.85 0 0 1 1.93-6.45 8.3 8.3 0 0 1 5.86-1.83c-.58-3.59-4.2-6.35-8.6-6.35m-2.9 3.8c.64 0 1.16.53 1.16 1.18a1.17 1.17 0 0 1-1.16 1.18 1.17 1.17 0 0 1-1.17-1.18c0-.65.52-1.18 1.17-1.18m5.8 0c.65 0 1.17.53 1.17 1.18a1.17 1.17 0 0 1-1.16 1.18 1.17 1.17 0 0 1-1.16-1.18c0-.65.52-1.18 1.16-1.18m5.34 2.87a8 8 0 0 0-5.28 1.78 5.5 5.5 0 0 0-1.78 6.22c.94 2.46 3.66 4.23 6.88 4.23q1.25 0 2.36-.33a.7.7 0 0 1 .6.08l1.59.93.14.04c.13 0 .24-.1.24-.24q-.01-.09-.04-.18l-.33-1.23-.02-.16a.5.5 0 0 1 .2-.4 5.8 5.8 0 0 0 2.5-4.62c0-3.21-2.93-5.84-6.66-6.09zm-2.53 3.27c.53 0 .97.44.97.98a1 1 0 0 1-.97.99 1 1 0 0 1-.97-.99c0-.54.43-.98.97-.98zm4.84 0c.54 0 .97.44.97.98a1 1 0 0 1-.97.99 1 1 0 0 1-.97-.99c0-.54.44-.98.97-.98"></path></svg>',
-    url: 'https://res.wx.qq.com/a/wx_fed/assets/res/NTI4MWU5.ico'
+    name: 'Instagram',
+    region: 'India',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#E4405F"/><text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">I</text></svg>',
+    url: 'https://www.instagram.com/favicon.ico'
   },
   {
-    name: 'Taobao',
-    region: 'CN',
-    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#E16322" d="M21.31 9.9a3 3 0 1 1 0 1.92.96.96 0 0 1 0-1.92m2.39 3.05H13.3v-.96h4.14V9.76h-2.89v-.77h2.9v-.92h-2.52v.2H13.3v-2.9h1.64v.35l2.52-.3V4.6h1.85v.64c.93-.08 1.76-.13 2.21-.1 1.5.06 2.45.27 2.49 1.26.03 1-1.43 1.9-1.43 1.9l-.45-.43v.2h-2.8v.92h3.22v.77h-3.23v2.23h4.39zM21.53 7.3l-.02-.01s1.38-.76.35-1.27c-.87-.43-5.54.3-6.93.62v.66z"></path></svg>',
-    url: 'https://img.alicdn.com/imgextra/i2/O1CN01qnQCrN1VkzAWiU4Hs_!!6000000002692-2-tps-33-33.png'
+    name: 'Amazon.in',
+    region: 'India',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#FF9900"/><text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#232F3E" text-anchor="middle">a</text></svg>',
+    url: 'https://www.amazon.in/favicon.ico'
+  },
+  {
+    name: 'Flipkart',
+    region: 'India',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#2874F0"/><text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">F</text></svg>',
+    url: 'https://www.flipkart.com/favicon.ico'
+  },
+  {
+    name: 'Hotstar',
+    region: 'India',
+    icon: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#1A1A1A"/><text x="12" y="17" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#00A9E0" text-anchor="middle">H</text></svg>',
+    url: 'https://www.hotstar.com/favicon.ico'
   },
   {
     name: 'GitHub',
@@ -3476,9 +3557,9 @@ function generateLatencyCards() {
   if (!container) return;
   container.innerHTML = '';
   const sortedSites = [...latencySites].sort((a, b) => {
-    const aIsCN = a.region === 'CN' ? 0 : 1;
-    const bIsCN = b.region === 'CN' ? 0 : 1;
-    return aIsCN - bIsCN;
+    const aIsIndia = a.region === 'India' ? 0 : 1;
+    const bIsIndia = b.region === 'India' ? 0 : 1;
+    return aIsIndia - bIsIndia;
   });
   sortedSites.forEach(site => {
     const siteName = site.name.toLowerCase().replace(/\s+/g, '-');
