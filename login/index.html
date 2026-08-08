@@ -928,9 +928,6 @@
 			loginBtn.disabled = true;
 			loginBtn.classList.add('btn-loading');
 
-			// 用户主动登录，重置自动重定向计数器
-			sessionStorage.removeItem('_auth_auto_redirect');
-
 			try {
 				const response = await fetch('/login', {
 					method: 'POST',
