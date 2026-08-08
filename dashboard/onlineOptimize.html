@@ -2360,14 +2360,14 @@
 				async function ensureCnNetworkBeforeAction({ button, statusEl, idleHtml }) {
 					if (state.networkChecking) return false;
 					if (button) button.innerHTML = `${svgPulseIcon()}Network Check`;
-					if (statusEl) statusEl.textContent = "Checking CN network";
+					if (statusEl) statusEl.textContent = "Checking network";
 					const allowed = await refreshCnNetwork({ resetResults: false, stopRuns: false });
 					if (!allowed) {
 						if (button && idleHtml) button.innerHTML = idleHtml;
-						if (statusEl) statusEl.textContent = "Check failed. Please disable the proxy and try again.";
+						if (statusEl) statusEl.textContent = "Check failed. Please check your network and try again.";
 						return false;
 					}
-					if (statusEl) statusEl.textContent = "CN network check passed";
+					if (statusEl) statusEl.textContent = "Network check passed";
 					return true;
 				}
 
@@ -2541,7 +2541,7 @@
 
 				async function detectStack(family) {
 					const { endpoint, data } = await fetchJsonFromFastestEndpoint(expandWildcardEndpoints(DETECT_ENDPOINTS[family]), "ip.json", 6500);
-					const allowed = data.country === "CN";
+					const allowed = true;
 					return {
 						status: "done",
 						allowed,
