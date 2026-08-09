@@ -209,7 +209,12 @@
       </div>
       <div class="field-row">
         <label>Protocol</label>
-        <div class="field-control"><select id="protocolSelect" onchange="onProtocolChange()"><option value="vless">VLESS</option></select></div>
+        <div class="field-control"><select id="protocolSelect" onchange="onProtocolChange()">
+          <option value="vless">VLESS</option>
+          <option value="vmess">VMess</option>
+          <option value="trojan">Trojan</option>
+          <option value="ss">Shadowsocks</option>
+        </select></div>
       </div>
       <div class="field-row">
         <label>Transport</label>
@@ -217,6 +222,11 @@
           <option value="ws">WebSocket (ws)</option>
           <option value="grpc">gRPC (grpc)</option>
           <option value="xhttp">XHTTP (xhttp)</option>
+          <option value="tcp">TCP (tcp)</option>
+          <option value="http">HTTP/2 (http)</option>
+          <option value="kcp">mKCP (kcp)</option>
+          <option value="quic">QUIC (quic)</option>
+          <option value="splithttp">Splithttp (splithttp)</option>
         </select></div>
       </div>
       <div class="field-row" id="grpcModeRow">
@@ -271,8 +281,8 @@
           </select>
         </div>
       </div>
-      <div class="field-row">
-        <label>Path</label>
+      <div class="field-row" id="pathRow">
+        <label id="pathLabel">Path</label>
         <div class="field-control"><input type="text" id="pathInput" oninput="onPathChange()"></div>
       </div>
       <div class="field-row checkbox-row">

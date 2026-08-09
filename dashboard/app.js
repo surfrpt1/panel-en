@@ -12,6 +12,10 @@ const PATH_TEMPLATES_URL = 'https://raw.githubusercontent.com/cmliu/cmliu/main/j
 
 const PROXY_PROTOCOLS = ['socks5', 'http', 'https', 'turn', 'sstp'];
 
+const PANEL_PROTOCOLS = ['vless', 'vmess', 'trojan', 'ss'];
+const PANEL_PROTOCOLS_LABELS = { vless: 'VLESS', vmess: 'VMess', trojan: 'Trojan', ss: 'Shadowsocks' };
+const PANEL_TRANSPORTS = ['ws', 'grpc', 'xhttp', 'tcp', 'http', 'kcp', 'quic', 'splithttp'];
+
 const HTTPS_PROXY_MIN_VERSION = 0;
 const TURN_SSTP_PROXY_MIN_VERSION = 0;
 const CHAIN_PROXY_MIN_VERSION = 20260506175102;
@@ -835,20 +839,15 @@ async function saveSub() {
 /* ---------- Detailed config ---------- */
 function syncSSProtocolSettingsFromConfig() {
   const protocolSelect = $('protocolSelect');
-  const hasSSConfig = !!(currentConfig && currentConfig.SS && typeof currentConfig.SS === 'object');
-  if (!protocolSelect.querySelector('option[value="vless"]')) {
-    const vlessOption = document.createElement('option');
-    vlessOption.value = 'vless';
-    vlessOption.textContent = 'VLESS';
-    protocolSelect.insertBefore(vlessOption, protocolSelect.firstChild);
+  for (const p of PANEL_PROTOCOLS) {
+    if (!protocolSelect.querySelector('option[value="' + p + '"]')) {
+      const option = document.createElement('option');
+      option.value = p;
+      option.textContent = PANEL_PROTOCOLS_LABELS[p] || p;
+      protocolSelect.appendChild(option);
+    }
   }
-  if (!protocolSelect.querySelector('option[value="ss"]')) {
-    const option = document.createElement('option');
-    option.value = 'ss';
-    option.textContent = 'Shadowsocks';
-    protocolSelect.appendChild(option);
-  }
-  if (hasSSConfig) {
+  if (currentConfig && currentConfig.SS && typeof currentConfig.SS === 'object') {
     $('ssMethodSelect').value = currentConfig.SS['加密方式'] || 'aes-128-gcm';
     $('ssTLSSelect').value = currentConfig.SS.TLS ? 'true' : 'false';
   } else {
@@ -857,19 +856,12 @@ function syncSSProtocolSettingsFromConfig() {
 }
 
 function syncTransportSettingsFromConfig() {
-  const hasGrpc = currentConfig && currentConfig['gRPC模式'] !== undefined;
   const transportRow = $('transportSelect').closest('.field-row');
   const grpcModeRow = $('grpcModeRow');
   const grpcUaRow = $('grpcUaRow');
-  if (!hasGrpc) {
-    transportRow.style.display = 'none';
-    grpcModeRow.style.display = 'none';
-    grpcUaRow.style.display = 'none';
-    return;
-  }
   transportRow.style.display = '';
   $('transportSelect').value = currentConfig['传输协议'] || 'ws';
-  if (!['ws', 'grpc', 'xhttp'].includes($('transportSelect').value)) {
+  if (!PANEL_TRANSPORTS.includes($('transportSelect').value)) {
     $('transportSelect').value = 'ws';
   }
   $('grpcModeSelect').value = currentConfig['gRPC模式'] || 'gun';
@@ -880,6 +872,17 @@ function syncTransportSettingsFromConfig() {
     grpcUaRow.style.display = 'none';
   }
   updateGrpcModeVisibility();
+  updatePathFieldVisibility();
+}
+
+function updatePathFieldVisibility() {
+  const transport = $('transportSelect').value;
+  const pathRow = $('pathRow');
+  if (!pathRow) return;
+  const usesPath = ['ws', 'grpc', 'http', 'xhttp', 'splithttp'].includes(transport);
+  pathRow.style.display = usesPath ? '' : 'none';
+  const label = pathRow.querySelector('label');
+  if (label) label.textContent = transport === 'grpc' ? 'Service Name' : 'Path';
 }
 
 function updateGrpcModeVisibility() {
@@ -893,6 +896,7 @@ function updateGrpcModeVisibility() {
 
 function onTransportChange() {
   updateGrpcModeVisibility();
+  updatePathFieldVisibility();
   markModified('config');
 }
 
@@ -934,6 +938,7 @@ function onProtocolChange() {
   }
   $('transportSelect').disabled = protocol === 'ss';
   updateGrpcModeVisibility();
+  updatePathFieldVisibility();
   updateECHOptionState();
   markModified('config');
 }
@@ -955,10 +960,8 @@ function saveConfig() {
     currentConfig.SS['加密方式'] = $('ssMethodSelect').value || 'aes-128-gcm';
     currentConfig.SS.TLS = $('ssTLSSelect').value === 'true';
   }
-  if (currentConfig['gRPC模式'] !== undefined) {
-    currentConfig['传输协议'] = $('transportSelect').value;
-    currentConfig['gRPC模式'] = $('grpcModeSelect').value || 'gun';
-  }
+  currentConfig['传输协议'] = $('transportSelect').value;
+  currentConfig['gRPC模式'] = $('grpcModeSelect').value || 'gun';
   if (currentConfig['gRPCUserAgent'] !== undefined) {
     const uaValue = $('grpcUaInput').value.replace(/\s+/g, '');
     currentConfig['gRPCUserAgent'] = uaValue ? $('grpcUaInput').value : (navigator.userAgent || '');
