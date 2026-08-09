@@ -796,6 +796,29 @@ async function loadCustomIPs() {
   }
 }
 
+async function refreshCustomIPs() {
+  const btn = document.querySelector('button[onclick="refreshCustomIPs()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '🔄 Refreshing…'; }
+  try {
+    const response = await fetch('/admin/refresh-ips', {
+      method: 'POST',
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+    });
+    const data = await response.json();
+    if (response.ok && data.success) {
+      $('customIPs').value = data.list.join('\n');
+      markModified('sub');
+      showToast(`✅ IP list refreshed: ${data.count} IPs`, 'success');
+    } else {
+      showToast('❌ Refresh failed: ' + (data.error || response.status), 'error');
+    }
+  } catch (error) {
+    showToast('❌ Refresh failed: ' + error.message, 'error');
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '🔄 Refresh IP List'; }
+  }
+}
+
 async function saveSub() {
   const mode = $('ipMode').value;
   if (mode === 'random' && !$('randomCount').value.trim()) {
