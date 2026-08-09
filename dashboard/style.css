@@ -57,6 +57,25 @@ button { cursor: pointer; }
 .topbar-actions button:hover, .module-actions button:hover, .field-control button:hover, .modal-actions button:hover { background: var(--bg-elevated); }
 .hidden { display: none !important; }
 
+/* Save-to-all toggle */
+.save-all-toggle {
+  display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg-card); color: var(--text);
+  padding: 5px 12px; border-radius: 7px; user-select: none; font-size: 13px;
+}
+.save-all-toggle input { position: absolute; opacity: 0; width: 0; height: 0; }
+.save-all-toggle .toggle-slider {
+  width: 28px; height: 16px; border-radius: 999px; background: var(--border);
+  position: relative; transition: background .15s; flex: 0 0 auto;
+}
+.save-all-toggle .toggle-slider::after {
+  content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--text-dim); transition: transform .15s, background .15s;
+}
+.save-all-toggle input:checked + .toggle-slider { background: #34c759; }
+.save-all-toggle input:checked + .toggle-slider::after { transform: translateX(12px); background: #fff; }
+.save-all-toggle.save-all-active { border-color: #34c759; }
+
 /* Page */
 .page-wrapper { max-width: 980px; margin: 20px auto; padding: 0 16px; }
 .card-container { display: flex; flex-direction: column; gap: 14px; }

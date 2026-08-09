@@ -405,19 +405,52 @@ async function loadConfig() {
 }
 
 async function saveConfigToServer(section) {
+  const endpoint = saveAllMode ? '/admin/saveAll' : '/admin/config.json';
   try {
-    const response = await fetch('/admin/config.json', {
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-cache, no-store, must-revalidate' },
       body: JSON.stringify(currentConfig)
     });
     if (!response.ok) throw new Error('save failed');
-    showToast('✅ Config saved. Refresh your subscription to get the latest nodes!', 'success');
+    if (saveAllMode) {
+      const result = await response.json();
+      const results = Array.isArray(result.results) ? result.results : [];
+      const synced = results.filter(r => r.ok).length;
+      const failed = results.filter(r => !r.ok);
+      if (failed.length === 0) {
+        showToast(`✅ Config saved to this worker + ${synced} linked dashboard${synced === 1 ? '' : 's'}`, 'success');
+      } else {
+        showToast(`⚠️ Saved locally + ${synced} linked. Failed: ${failed.map(f => f.url || 'unknown').join(', ')}`, 'error');
+      }
+    } else {
+      showToast('✅ Config saved. Refresh your subscription to get the latest nodes!', 'success');
+    }
     modifiedSections.delete(section);
     updateButtonStates();
   } catch (error) {
     showToast('😢 ' + error.message + ' — check your network or disable your proxy and retry.', 'error');
   }
+}
+
+/* ---------- Save to all linked dashboards ---------- */
+let saveAllMode = false;
+
+function setSaveAllMode(enabled) {
+  saveAllMode = !!enabled;
+  try { localStorage.setItem('saveAllMode', saveAllMode ? '1' : '0'); } catch (_) {}
+  const wrap = $('saveAllToggleWrap');
+  if (wrap) wrap.classList.toggle('save-all-active', saveAllMode);
+  const label = $('saveAllLabel');
+  if (label) label.textContent = saveAllMode ? 'Save to all ✓' : 'Save to all';
+}
+
+function initSaveAllMode() {
+  let saved = false;
+  try { saved = localStorage.getItem('saveAllMode') === '1'; } catch (_) {}
+  const toggle = $('saveAllToggle');
+  if (toggle) toggle.checked = saved;
+  setSaveAllMode(saved);
 }
 
 /* ---------- Render UI ---------- */
@@ -3964,6 +3997,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { hasAuthToken = sessionStorage.getItem(AUTHD_KEY) === '1'; } catch (_) {}
   if (hasAuthToken) {
     try { sessionStorage.removeItem(AUTHD_KEY); } catch (_) {}
+    initSaveAllMode();
     loadConfig();
     loadImportLinks();
     scheduleNetworkInfoLoad();
