@@ -659,10 +659,9 @@ function addImportLink() {
   if (!input) return;
   const raw = input.value.trim();
   if (!raw) { showToast('Paste a dashboard URL first', 'error'); return; }
-  let url = raw;
+  let url = /^https?:\/\//i.test(raw) ? raw : 'https://' + raw;
   try {
-    const parsed = new URL(raw);
-    if (!parsed.pathname || parsed.pathname === '/' || parsed.pathname === '') url = parsed.origin + '/dashboard/';
+    new URL(url);
   } catch (e) {
     showToast('Invalid URL: ' + raw, 'error');
     return;
