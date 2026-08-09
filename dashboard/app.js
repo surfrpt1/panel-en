@@ -19,10 +19,11 @@ const CHAIN_PROXY_MIN_VERSION = 20260506175102;
 const latencyFetchTimeoutMs = 8000;
 
 const echDNSOptions = [
-  { value: 'https://dns.alidns.com/dns-query', label: 'AliDNS DoH (Recommended)' },
-  { value: 'https://sm2.doh.pub/dns-query', label: 'Tencent DoH' },
-  { value: 'https://doh.360.cn/dns-query', label: '360 DoH' },
-  { value: 'https://doh.onedns.net/dns-query', label: 'OneDNS DoH' },
+  { value: 'https://cloudflare-dns.com/dns-query', label: 'Cloudflare DoH (Recommended)' },
+  { value: 'https://dns.google/dns-query', label: 'Google DoH' },
+  { value: 'https://dns.quad9.net/dns-query', label: 'Quad9 DoH' },
+  { value: 'https://dns.adguard-dns.com/dns-query', label: 'AdGuard DoH' },
+  { value: 'https://dns.nextdns.io', label: 'NextDNS DoH' },
   { value: 'custom', label: 'Custom' }
 ];
 const echSNIOptions = [
